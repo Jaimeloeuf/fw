@@ -47,14 +47,17 @@ const server = http.createServer((req, res) => {
 		// Logging payload if any
 		if (buffer)
 			log('Received payload is = ', JSON.parse(buffer));
-			// log('Received payload is = ', buffer); // Received buffer is always a string. But in my case, since this
-			// api server is designed to talk with JSON, I will parse it first before printing it out.
+		// log('Received payload is = ', buffer); // Received buffer is always a string. But in my case, since this
+		// api server is designed to talk with JSON, I will parse it first before printing it out.
 
 		// Check router for a matching path for a handler. If none defined, use the notFound handler instead.
-		var chosenHandler = (router[path]) ? router[trimmedPath] : handlers.notFound;
+		// let chosenHandler = (router[path]) ? router[path] : handler.notFound;
+		let chosenHandler = router[path];
+		if (!chosenHandler)
+			chosenHandler = handler.notFound;
 
 		// Construct the data object to send to the handler
-		var data = {
+		let data = {
 			'path': path,
 			'query': query,
 			// 'method': method,
@@ -63,61 +66,66 @@ const server = http.createServer((req, res) => {
 		};
 
 		// Route the request to the handler specified in the router
-		// chosenHandler(data, (statusCode = 200, res_payload = {}) => {
-		chosenHandler(data, (statusCode, res_payload) => {
-			// Where This anonymous inner funciton is the callback function called in the handlers.
-			// This function is the final handler, also known as the finalHandler in the Express world.
+		chosenHandler(data, finalHandler);
 
-			// Use status code from the handler, else use default status code 200
-			statusCode = typeof (statusCode) === 'number' ? statusCode : 200;
-			// Use the res_payload returned from the handler, or use default empty object
-			res_payload = typeof (res_payload) == 'object' ? res_payload : {};
+		// Where This anonymous inner funciton is the next function called in the handlers.
+		// This function is the final handler, also known as the finalHandler in the Express world.
+		// I should probably refactor the function out into a seperate module like what Express did
+		function finalHandler({ statusCode = 200, res_payload = {} } = {}) {
+			// Learn more about object destructuring for function parameters
 
 			// Should I set headers here or just leave it?
 			res.writeHead(statusCode);
+			
 			// Convert res_payload to string and write it to the 'res' stream
+			// Should this conversion be done in the handler function? Or done here?
+			// Maybe allow one more option in the handler to specify if they want the payload to be stringfied
 			res.end(JSON.stringify(res_payload));
 
 			log(`Returning this response: ${statusCode}, `, res_payload);
-		});
+		}
 	});
 
 }).listen(PORT, (err) => {
 	log(((err) ? 'Error, server cannot listen on port: ' : 'Server listening on port: ') + PORT);
 });
 
-const handlers = {};
+const handler = {};
 
-handlers.login = (data, callback) => {
+handler.login = (data, next) => {
 	// if (async auth_db(headers.authentication)) {
 	// 	await ok();
 	// 	response.writeHead({ 'Set-cookie': `${cookie}; ${expiry_date};` })
-	// 	callback(307, { 'location': `/${location}` })
+	// 	next(307, { 'location': `/${location}` })
 	// }
 }
 
-handlers.logout = (data, callback) => {
+handler.logout = (data, next) => {
 
 }
 
 // Sample handler
-handlers.sample = function (data, callback) {
+handler.sample = function (data, next) {
 	// Send back a HTTP code and a 'res' payload
-	callback(200, { 'handler name': 'sample handler' });
+	// next({
+	// 	res_payload: { 'handler name': 'sample handler' }
+	// });
+	next();
 };
 
 // Not found handler
-handlers.notFound = function (data, callback) {
-	callback(404);
+handler.notFound = function (data, next) {
+	next(404);
 };
 
 
 // Define the request router
 const router = {
-	'/login': handlers.login,
-	'/logout': handlers.logout,
+	'sample': handler.sample,
+	'login': handler.login,
+	'logout': handler.logout,
 };
 // const router = new Map([
-// 	['/login', handlers.login],
-// 	['/logout', handlers.logout],
+// 	['login', handlers.login],
+// 	['logout', handlers.logout],
 // ]);
