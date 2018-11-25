@@ -35,6 +35,7 @@ function log() {
 	console.log(); // Print a trailing new line
 }
 
+// @TODO write a condition to check the environment. Disable debug object if envName = 'production'
 const debug = {
 	console_lines: (n) => {
 		for (let i = 0; i < n; i++)

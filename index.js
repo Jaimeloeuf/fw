@@ -4,12 +4,23 @@
 const { env } = require('./config');
 const http = require('http');
 const url = require('url');
+// const fs = require('fs');
 const decoder = new (require('string_decoder').StringDecoder);
 const { log, debug } = require('./utils');
 
-const server = http.createServer((req, res) => {
+const httpServer = http.createServer((req, res) => {
+	unifiedServer(req, res);
+
+}).listen(env.port, (err) => {
+	log(`Node running in the '${env.envName}' mode/environment`)
+	log(((err) ? 'Error, server cannot listen on port: ' : 'Server listening on port: ') + env.port);
+});
+
+// unifiedServer is basically just the first middleWare called by the createServer function
+// Can be used to handle requests from both the HTTP and HTTPS server in the future
+function unifiedServer(req, res) {
 	debug.console_lines(90);
-	/*
+	/*	Flow of logic:
 	Parse req object and save all info into 'data' object
 	Route the 'data' object to a handler as defined in the router
 	handle the req with the given data, before
@@ -42,12 +53,12 @@ const server = http.createServer((req, res) => {
 	req.on('end', () => {
 		buffer += decoder.end(); // Returns any remaining input stored in internal buffer.
 
-		// Logging payload if any
-		if (buffer)
-			if (req.headers["content-type"] === 'application/json') // How do I detect if the received payload is a JSON? By content-type?
-				log('Received payload is = ', JSON.parse(buffer));
-		// log('Received payload is = ', buffer); // Received buffer is always a string. But in my case, since this
-		// api server is designed to talk with JSON, I will parse it first before printing it out.
+		// Log payload if any
+		if (buffer) {
+			// Parse buffer of JSON format
+			buffer = (req.headers["content-type"] === 'application/json') ? JSON.parse(buffer) : buffer
+			log('Payload Received: ', buffer);
+		}
 
 
 		// Check router for a matching path for a handler. If none defined, use the notFound handler instead.
@@ -68,10 +79,14 @@ const server = http.createServer((req, res) => {
 		// Route the request to the handler specified in the router
 		chosenHandler(data, finalHandler);
 
-		// Where This anonymous inner funciton is the next function called in the handlers.
-		// This function is the final handler, also known as the finalHandler in the Express world.
-		// I should probably refactor the function out into a seperate module like what Express did
-		function finalHandler({ statusCode = 200, res_payload = {} } = {}) { // I shld copy koa and pass a ctx to this
+		/* @TODO Copy koa and pass a ctx to this
+			Where ctx is an object containing both the req and res objects, and also the parsed 'Data' object
+		
+			This anonymous inner funciton is the 'next' function called in the handlers.
+			This function is the final handler, also known as finalHandler in the Express world.
+			@TODO Refactor this function out into a seperate module like what Express did
+ 		*/
+		function finalHandler({ statusCode = 200, res_payload = {} } = {}) {
 			// Learn more about object destructuring for function parameters
 
 			// Should I set headers here or just leave it?
@@ -87,14 +102,11 @@ const server = http.createServer((req, res) => {
 			log(`Returning this response: ${statusCode}, `, res_payload);
 		}
 	});
-
-}).listen(env.port, (err) => {
-	log(`Node running in the '${env.envName}' mode/environment`)
-	log(((err) ? 'Error, server cannot listen on port: ' : 'Server listening on port: ') + env.port);
-});
+}
 
 const handler = {};
 
+// Login handler
 handler.login = (data, next) => {
 	// if (async auth_db(headers.authentication)) {
 	// 	await ok();
@@ -102,7 +114,7 @@ handler.login = (data, next) => {
 	// 	next(307, { 'location': `/${location}` })
 	// }
 }
-
+// logout handler
 handler.logout = (data, next) => {
 
 }
