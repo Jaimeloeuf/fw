@@ -1,15 +1,6 @@
-/* Write function only avail in this module/package. Thus encapsulated.
-Created to be a more efficient alternative to log(), as it uses many assumptions
-Assume write is only called with 'strings' as arguement type. */
 // Version 1 of write, assumes that it must be a string an no error is made during usage
 const write = (str) => process.stdout.write(str);
-// Version 2 of write
-// const write = (str) => {
-// 	if (typeof (str) !== 'string')
-// 		throw err;
-// 	process.stdout.write(str);
-// }
-// Version 3 of write, currently Deperecated 'write' function below
+// Version 2 of write, currently Deperecated 'write' function below
 // const write = (str, newline = false) => (typeof (str) !== 'string')
 // 	? console.log(str)
 // 	: process.stdout.write((newline) ? `${str}\n` : str);
@@ -38,7 +29,8 @@ function log() {
 // @TODO write a condition to check the environment. Disable debug object if envName = 'production'
 const debug = {
 	console_lines: (n) => {
-		for (let i = 0; i < n; i++)
+		// Print out 'n' number of dashes on the console, used to seperate stuff
+		while(--n) // A reverse while loop, more efficient than the old for loop
 			write('-');
 	},
 	
