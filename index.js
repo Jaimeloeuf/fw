@@ -6,7 +6,6 @@ const http = require('http');
 const { getCTX } = require('./ctx');
 const decoder = new (require('string_decoder').StringDecoder);
 const router = require('./router');
-const handler = require('./handlers');
 const { log, debug } = require('./utils');
 
 const httpServer = http.createServer((req, res) => unifiedServer(req, res))
@@ -42,19 +41,11 @@ function unifiedServer(req, res) {
 			buffer = (req.headers["content-type"] === 'application/json') ? JSON.parse(buffer) : buffer
 			log('Payload Received: ', buffer);
 		}
-
-
-		// Check router for a matching path for a handler. If none defined, use the notFound handler instead.
-		// let chosenHandler = (router[ctx.path]) ? router[ctx.path] : handler.notFound;
-		let chosenHandler = router[ctx.path];
-		if (!chosenHandler)
-			chosenHandler = handler.notFound;
-
 		// Add payload in buffer from request object into the context object 'ctx'
 		ctx.req_payload = buffer || undefined;
 
-		// Route the request to the handler specified in the router
-		chosenHandler(ctx, finalHandler);
+		// Get a route handler from router and route the ctx to handler
+		router(ctx.path)(ctx, finalHandler);
 
 		/*	This anonymous inner funciton is the 'next' function called in the handlers.
 			This function is the final handler, also known as finalHandler in the Express world.

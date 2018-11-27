@@ -6,6 +6,7 @@ const handler = require('./handlers');
 // Define the request router
 const router = {
 	'sample': handler.sample,
+	'ping': handler.ping,
 	'login': handler.login,
 	'logout': handler.logout,
 };
@@ -14,4 +15,7 @@ const router = {
 // 	['logout', handlers.logout],
 // ]);
 
-module.exports = router;
+
+// Check the router object/hashmap with route for a handler.
+// If none defined, use the notFound handler.
+module.exports = route => (router[route]) ? router[route] : handler.notFound;
