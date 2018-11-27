@@ -5,6 +5,7 @@ const { env } = require('./config');
 const http = require('http');
 const { getCTX } = require('./ctx');
 const decoder = new (require('string_decoder').StringDecoder);
+const router = require('./router');
 const handler = require('./handlers');
 const { log, debug } = require('./utils');
 
@@ -76,14 +77,3 @@ function unifiedServer(req, res) {
 		}
 	});
 }
-
-// Define the request router
-const router = {
-	'sample': handler.sample,
-	'login': handler.login,
-	'logout': handler.logout,
-};
-// const router = new Map([
-// 	['login', handlers.login],
-// 	['logout', handlers.logout],
-// ]);
