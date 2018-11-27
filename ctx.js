@@ -38,6 +38,10 @@ module.exports.getCTX = (req, res) => {
 		method: req.method.toUpperCase(),
 		// Get headers as an object
 		headers: req.headers,
+		// Get the contentType of the incoming req payload, to be used for parsing the payload
+		contentType: req.headers["content-type"],
+		// Method to check if content-type of incoming req payload is equals to given type
+		checkContentType: (type) => type === req.headers["content-type"],
 		// Get the query string as an object
 		query: parsedUrl.query,
 

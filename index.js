@@ -38,7 +38,7 @@ function unifiedServer(req, res) {
 		// Log payload if any
 		if (buffer) {
 			// Parse buffer of JSON format
-			buffer = (req.headers["content-type"] === 'application/json') ? JSON.parse(buffer) : buffer
+			buffer = ctx.checkContentType('application/json') ? JSON.parse(buffer) : buffer
 			log('Payload Received: ', buffer);
 		}
 		// Add payload in buffer from request object into the context object 'ctx'
