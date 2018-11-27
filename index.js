@@ -5,6 +5,7 @@ const { env } = require('./config');
 const http = require('http');
 const { getCTX } = require('./ctx');
 const decoder = new (require('string_decoder').StringDecoder);
+const handler = require('./handlers');
 const { log, debug } = require('./utils');
 
 const httpServer = http.createServer((req, res) => unifiedServer(req, res))
@@ -75,36 +76,6 @@ function unifiedServer(req, res) {
 		}
 	});
 }
-
-const handler = {};
-
-// Login handler
-handler.login = (ctx, next) => {
-	// if (async auth_db(headers.authentication)) {
-	// 	await ok();
-	// 	response.writeHead({ 'Set-cookie': `${cookie}; ${expiry_date};` })
-	// 	next(307, { 'location': `/${location}` })
-	// }
-}
-// logout handler
-handler.logout = (ctx, next) => {
-
-}
-
-// Sample handler
-handler.sample = function (ctx, next) {
-	// Send back a HTTP code and a 'res' payload
-	next({
-		res_payload: { 'handler name': 'sample handler' }
-	});
-	// next();
-};
-
-// Not found handler
-handler.notFound = function (ctx, next) {
-	next(404);
-};
-
 
 // Define the request router
 const router = {
