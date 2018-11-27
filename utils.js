@@ -40,6 +40,15 @@ const debug = {
 	console_lines: (n) => {
 		for (let i = 0; i < n; i++)
 			write('-');
+	},
+	
+	logout_req_params(ctx) {
+		// Debug middleware to log out details from ctx object
+		debug.console_lines(90);
+		log(`\nRequested path: '${ctx.path}'`);
+		log(`Request method: '${ctx.method}'`);
+		log('Queries received in url = ', ctx.query);
+		log('Headers received = ', ctx.headers);
 	}
 };
 

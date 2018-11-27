@@ -3,47 +3,28 @@
 // Dependencies
 const { env } = require('./config');
 const http = require('http');
-const url = require('url');
-// const fs = require('fs');
+const { getCTX } = require('./ctx');
 const decoder = new (require('string_decoder').StringDecoder);
 const { log, debug } = require('./utils');
 
-const httpServer = http.createServer((req, res) => {
-	unifiedServer(req, res);
-
-}).listen(env.port, (err) => {
+const httpServer = http.createServer((req, res) => unifiedServer(req, res))
+	.listen(env.port, (err) => {
 	log(`Node running in the '${env.envName}' mode/environment`)
 	log(((err) ? 'Error, server cannot listen on port: ' : 'Server listening on port: ') + env.port);
 });
 
-// unifiedServer is basically just the first middleWare called by the createServer function
-// Can be used to handle requests from both the HTTP and HTTPS server in the future
+// unifiedServer used to handle requests from both the HTTP and HTTPS server in the future
 function unifiedServer(req, res) {
-	debug.console_lines(90);
 	/*	Flow of logic:
-	Parse req object and save all info into 'data' object
-	Route the 'data' object to a handler as defined in the router
-	handle the req with the given data, before
+	Parse req object with getCTX()
+	Route the 'ctx' object to a handler as defined in the router
+	handle the req with the given ctx, before
 	calling the final handler of the req and end the response to the user
 	*/
 
-	// Get URL and parse it, parse query strings if any in url
-	let parsedUrl = url.parse(req.url, true);
-
-	// Get the path
-	let path = parsedUrl.pathname.replace(/^\/+|\/+$/g, '');
-	log(`\nRequested path: '${path}'`);
-
-	// Get the request method
-	log(`Request method: '${req.method.toUpperCase()}'`);
-
-	// Get the query string as an object
-	let query = parsedUrl.query;
-	log('Queries received in url = ', query);
-
-	// Get headers as an object
-	let headers = req.headers;
-	log('Headers received = ', headers);
+	// Create 'ctx' object with (req, res) objects
+	let ctx = getCTX(req, res);
+	debug.logout_req_params(ctx);
 
 	// Get the payload if any
 	let buffer = '';
@@ -62,27 +43,18 @@ function unifiedServer(req, res) {
 
 
 		// Check router for a matching path for a handler. If none defined, use the notFound handler instead.
-		// let chosenHandler = (router[path]) ? router[path] : handler.notFound;
-		let chosenHandler = router[path];
+		// let chosenHandler = (router[ctx.path]) ? router[ctx.path] : handler.notFound;
+		let chosenHandler = router[ctx.path];
 		if (!chosenHandler)
 			chosenHandler = handler.notFound;
 
-		// Construct the data object to send to the handler
-		let data = {
-			'path': path,
-			'query': query,
-			// 'method': method,
-			'headers': headers,
-			'payload': buffer || undefined
-		};
+		// Add payload in buffer from request object into the context object 'ctx'
+		ctx.req_payload = buffer || undefined;
 
 		// Route the request to the handler specified in the router
-		chosenHandler(data, finalHandler);
+		chosenHandler(ctx, finalHandler);
 
-		/* @TODO Copy koa and pass a ctx to this
-			Where ctx is an object containing both the req and res objects, and also the parsed 'Data' object
-		
-			This anonymous inner funciton is the 'next' function called in the handlers.
+		/*	This anonymous inner funciton is the 'next' function called in the handlers.
 			This function is the final handler, also known as finalHandler in the Express world.
 			@TODO Refactor this function out into a seperate module like what Express did
  		*/
@@ -107,7 +79,7 @@ function unifiedServer(req, res) {
 const handler = {};
 
 // Login handler
-handler.login = (data, next) => {
+handler.login = (ctx, next) => {
 	// if (async auth_db(headers.authentication)) {
 	// 	await ok();
 	// 	response.writeHead({ 'Set-cookie': `${cookie}; ${expiry_date};` })
@@ -115,12 +87,12 @@ handler.login = (data, next) => {
 	// }
 }
 // logout handler
-handler.logout = (data, next) => {
+handler.logout = (ctx, next) => {
 
 }
 
 // Sample handler
-handler.sample = function (data, next) {
+handler.sample = function (ctx, next) {
 	// Send back a HTTP code and a 'res' payload
 	next({
 		res_payload: { 'handler name': 'sample handler' }
@@ -129,7 +101,7 @@ handler.sample = function (data, next) {
 };
 
 // Not found handler
-handler.notFound = function (data, next) {
+handler.notFound = function (ctx, next) {
 	next(404);
 };
 
