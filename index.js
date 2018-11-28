@@ -5,6 +5,7 @@ const { env } = require('./config');
 const http = require('http');
 const { getCTX } = require('./ctx');
 const getPayload = require('./req_payload');
+const parser = require('./parser');
 const router = require('./router');
 const { log, debug } = require('./utils');
 
@@ -18,7 +19,8 @@ const httpServer = http.createServer((req, res) => unifiedServer(req, res))
 function unifiedServer(req, res) {
 	/*	Flow of logic:
 	Parse req object with getCTX()
-	Get any payload from req with getPayload promise
+	Get payload from req with getPayload promise
+	Parse payload if neccessary with parser promise
 	Route the 'ctx' object to a handler as defined in the router
 	handle the req with the given ctx, before
 	calling the final handler of the req and end the response to the user
@@ -26,17 +28,22 @@ function unifiedServer(req, res) {
 
 	// Create 'ctx' object with (req, res) objects
 	const ctx = getCTX(req, res);
-	debug.logout_req_params(ctx);
 
-	// Get incoming req payload
+	/*	Promises Logic flow:
+		1. Get incoming req payload
+		2. When the getPayload Promise resolves after receiving full payload
+		3. parser is called to Parse and save payload into 'ctx'
+		4. Get a route handler from router and route the 'ctx' to handler
+		4.1. Inject the finalHandler dependency into the route handler too	*/
 	getPayload(ctx)
-		.then((ctx) => {
-			// Get a route handler from router and route the ctx to handler
-			router(ctx.path)(ctx, finalHandler);
-		})
-		.catch((error) => {
-			log(error);
-		});
+		.then((ctx) => parser(ctx))
+		.then((ctx) => router(ctx)(ctx, finalHandler))
+		.catch((error) => log(error));
+	// Perhaps modify CTX agn by adding in a error object, for finalHandler to deal with
+	// But problem is there is no more code that will run for a req after the 'catch' method
+
+	// Put this in the 'then' method chaining to allow it to run in sequence with the async code
+	debug.logout_req_params(ctx);
 
 
 	/*	This anonymous inner funciton is the 'next' function called in the handlers.
@@ -58,6 +65,8 @@ function unifiedServer(req, res) {
 		// Maybe allow one more option in the handler to specify if they want the payload to be stringfied
 		res.end(JSON.stringify(res_payload));
 
+		// ctx.statusCode = statusCode;
+		// ctx.res_payload = res_payload;
 		log(`Returning this response: ${statusCode}, `, res_payload);
 	}
 }

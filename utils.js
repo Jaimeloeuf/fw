@@ -41,6 +41,9 @@ const debug = {
 		log(`Request method: '${ctx.method}'`);
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
+		log('Payload Received: ', ctx.req_payload);
+
+		// log(`Returning this response: ${ctx.statusCode}, `, ctx.res_payload);
 	}
 };
 

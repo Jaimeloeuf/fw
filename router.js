@@ -18,4 +18,4 @@ const router = {
 
 // Check the router object/hashmap with route for a handler.
 // If none defined, use the notFound handler.
-module.exports = route => (router[route]) ? router[route] : handler.notFound;
+module.exports = ctx => (router[ctx.path]) ? router[ctx.path] : handler.notFound;

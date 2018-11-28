@@ -2,13 +2,10 @@
 
 // Dependencies
 const decoder = new (require('string_decoder').StringDecoder);
-const parser = require('./parser');
-const { log } = require('./utils');
 
 // Module to handle incoming requests
 var buffer;
-module.exports = getPayload;
-function getPayload(ctx) {
+module.exports = (ctx) => {
 	return new Promise((resolve, reject) => {
 		buffer = ''; // Reset/clear buffer
 		ctx.req
@@ -16,50 +13,11 @@ function getPayload(ctx) {
 			.on('error', error => reject(error))
 			.on('end', () => {
 				// If no payload, then 'end' event is fired immediately
-				// If buffer is not empty
-				if (buffer) {
-					buffer += decoder.end(); // Returns any remaining input stored in internal buffer.
-					
-					// Call parser to Parse and Add payload from request object, into the context object 'ctx'
-					parser(ctx, buffer)
-						.then((buffer) => {
-							log('Payload Received: ', buffer); // Debug logging
-						})
-						.catch((error) => {
-							// Perhaps modify CTX agn by adding in a error object, for finalHandler to deal with
-							log(error);
-						});
-				}
-				else {
-					// Should this be left empty or put as null?
-					// Because if I dont set it, then when accessing the data, it should be a undefined by default
-					ctx.req_payload = undefined;
-				}
-				resolve(ctx);
+				if (buffer)
+					ctx.req_payload = buffer + decoder.end(); // Flush out decoder buffer if 'buffer' not null
+				else
+					ctx.req_payload = undefined; // Make sure that req_payload is undefined if current buffer is empty
+				resolve(ctx); // Resolve with 'ctx' for the next function in 'then' chaining
 			});
 	});
-}
-
-function getPayload2(ctx) {
-	// Async function without proper sequencing.
-	// Deprecated by the new getPayload function with promises.
-
-	// Get the payload if any
-	buffer = ''; // Reset/clear buffer
-	ctx.req
-		.on('data', data => buffer += decoder.write(data))
-		.on('error', error => log(error))
-		.on('end', () => {
-			// If no payload, then 'end' event is fired immediately
-			// If buffer is not empty
-			if (buffer) {
-				buffer += decoder.end(); // Returns any remaining input stored in internal buffer.
-				// Parse and Add payload in buffer from request object, into the context object 'ctx'
-				ctx.req_payload = parser(ctx, buffer);
-			}
-			else
-				// Should this be left empty or put as null?
-				// Because if I dont set it, then when accessing the data, it should be a undefined by default
-				ctx.req_payload = undefined;
-		});
 }
