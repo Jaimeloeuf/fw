@@ -3,6 +3,7 @@
 // Dependencies
 const decoder = new (require('string_decoder').StringDecoder);
 const parser = require('./parser');
+const { log } = require('./utils');
 
 // Module to handle incoming requests
 var buffer;
@@ -18,8 +19,16 @@ function getPayload(ctx) {
 				// If buffer is not empty
 				if (buffer) {
 					buffer += decoder.end(); // Returns any remaining input stored in internal buffer.
+					
 					// Call parser to Parse and Add payload from request object, into the context object 'ctx'
-					parser(ctx, buffer);
+					parser(ctx, buffer)
+						.then((buffer) => {
+							log('Payload Received: ', buffer); // Debug logging
+						})
+						.catch((error) => {
+							// Perhaps modify CTX agn by adding in a error object, for finalHandler to deal with
+							log(error);
+						});
 				}
 				else {
 					// Should this be left empty or put as null?
