@@ -38,6 +38,8 @@ module.exports.getCTX = (req, res) => {
 		method: req.method.toUpperCase(),
 		// Get headers as an object
 		headers: req.headers,
+		// User Agent header for analytics
+		// userAgent: req.headers['user-agent'];
 		// Get the contentType of the incoming req payload, to be used for parsing the payload
 		contentType: req.headers["content-type"],
 		// Method to check if content-type of incoming req payload is equals to given type
