@@ -42,8 +42,8 @@ const debug = {
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
 		log('Payload Received: ', ctx.req_payload);
-
-		// log(`Returning this response: ${ctx.statusCode}, `, ctx.res_payload);
+		log(`Returning this response: ${ctx.statusCode}, `, ctx.res_payload);
+		return ctx; // Can be used to trigger next .then method, since it can be part of a .then chaining with other Promises
 	}
 };
 

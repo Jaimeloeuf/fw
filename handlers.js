@@ -3,53 +3,39 @@
 const handler = {};
 
 // Login handler
-handler.login = (ctx, next) => {
+handler.login = (ctx) => {
 	// if (async auth_db(headers.authentication)) {
 	// 	await ok();
 	// 	response.writeHead({ 'Set-cookie': `${cookie}; ${expiry_date};` })
 	// 	next(307, { 'location': `/${location}` })
 	// }
+
+	return ctx; // To trigger the next .then method
 }
 // logout handler
-handler.logout = (ctx, next) => {
+handler.logout = (ctx) => {
 
+	return ctx; // To trigger the next .then method
 }
 
 // Sample handler using 'ctx'
-handler.sample = function (ctx, next) {
+handler.sample = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
-	// next({
-	// 	res_payload: { 'handler name': 'sample handler' }
-	// });
-	// next();
 	ctx.statusCode = 201;
 	ctx.res_payload = { 'handler name': 'sample handler' };
+	return ctx; // To trigger the next .then method
 };
 
 // Ping handler to see if server is up
-handler.ping = function (ctx, next) {
-	// Send back a HTTP code and a 'res' payload
-	next({
-		res_payload: { 'handler name': 'sample handler' }
-	});
-	// next(200); // Indicate server is still up
+handler.ping = (ctx) => {
+	ctx.statusCode = 200; // Send back a HTTP code to indicate server is up
+	return ctx; // To trigger the next .then method
 };
 
 // Not found handler
-handler.notFound = function (ctx, next) {
-	next(404);
+handler.notFound = (ctx) => {
+	ctx.statusCode = 404; // Send back a HTTP code to indicate route not defined
+	return ctx; // To trigger the next .then method
 };
 
 module.exports = handler;
-
-// To fix and use below as the finalHandler
-// finalHandler(respond(getPayload(ctx)));
-// getPayload(ctx, respond)
-// function flow(req, res) {
-// 	let ctx = getCTX(req, res);
-// 	for (let i = 0, len = this.array.length; i < len; i++) {
-// 		// Use generators and iterators here instead to allow for a procedural async workflow
-// 		async
-// 	}
-// 	finalHandler(ctx);
-// }
