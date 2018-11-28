@@ -5,6 +5,7 @@ const { env } = require('./config');
 const http = require('http');
 const { getCTX } = require('./ctx');
 const decoder = new (require('string_decoder').StringDecoder);
+const parser = require('./parser');
 const router = require('./router');
 const { log, debug } = require('./utils');
 
@@ -35,14 +36,8 @@ function unifiedServer(req, res) {
 	req.on('end', () => {
 		buffer += decoder.end(); // Returns any remaining input stored in internal buffer.
 
-		// Log payload if any
-		if (buffer) {
-			// Parse buffer of JSON format
-			buffer = ctx.checkContentType('application/json') ? JSON.parse(buffer) : buffer
-			log('Payload Received: ', buffer);
-		}
-		// Add payload in buffer from request object into the context object 'ctx'
-		ctx.req_payload = buffer || undefined;
+		// Parse and Add payload in buffer from request object, into the context object 'ctx'
+		ctx.req_payload = parser(ctx, buffer);
 
 		// Get a route handler from router and route the ctx to handler
 		router(ctx.path)(ctx, finalHandler);
@@ -50,6 +45,8 @@ function unifiedServer(req, res) {
 		/*	This anonymous inner funciton is the 'next' function called in the handlers.
 			This function is the final handler, also known as finalHandler in the Express world.
 			@TODO Refactor this function out into a seperate module like what Express did
+
+			@TODO refactor this handler to accept the 'ctx' object too.
  		*/
 		function finalHandler({ statusCode = 200, res_payload = {} } = {}) {
 			// Learn more about object destructuring for function parameters
