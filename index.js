@@ -9,10 +9,27 @@ const parser = require('./parser');
 const router = require('./router');
 const { log, debug } = require('./utils');
 
-const httpServer = http.createServer((req, res) => unifiedServer(req, res))
+// Perhaps add the process.on uncaught error? or process.on exit?
+// ALso learn how to use process.nextTick() for seeing performance and to help with optimization
+
+http.createServer(unifiedServer)
 	.listen(env.port, (err) => {
 		log(`Node running in the '${env.envName}' mode/environment`)
 		log(((err) ? 'Error, server cannot listen on port: ' : 'Server listening on port: ') + env.port);
+		if (err)
+			process.exit();
+	})
+	.on('error', (err) => {
+		log(err)
+		process.exit();
+	})
+	.on('clientError', (err, socket) => {
+		if (err) log(err);
+		socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+	})
+	.on('close', () => {
+		// Last actions before the server closes. Perhaps send a close success/error signal back to process caller?
+		log('Server closed');
 	});
 
 // unifiedServer used to handle requests from both the HTTP and HTTPS server in the future
@@ -25,7 +42,7 @@ function unifiedServer(req, res) {
 		3. Get a route handler from router and route the 'ctx' to handler
 		4. Handle the req with the given ctx, when route-handler/middleware is done,
 		5. Call finalHandler and send response back to user	*/
-		
+
 	// Create 'ctx' object with (req, res) objects
 	const ctx = getCTX(req, res);
 
