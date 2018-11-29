@@ -50,22 +50,22 @@ function unifiedServer(req, res) {
 		.then((ctx) => parser(ctx))
 		.then((ctx) => router(ctx)(ctx))
 		.then((ctx) => finalHandler(ctx))
-		.then((ctx) => debug.logout_req_params(ctx))
+		.then((ctx) => debug.logout_params(ctx))
 		.catch((error) => log(error));
 	// Perhaps modify CTX agn by adding in a error object, for finalHandler to deal with
 	// Problem is there is no more code that will run for a req after the 'catch' method
 }
 
-/*	This function is the final handler, also known as finalHandler in the Express world.
-	@TODO Refactor this function out into a seperate module like what Express did	*/
+// This function is the final handler, also known as finalHandler in the Express world.
 function finalHandler(ctx) {
-	let { res } = ctx;
-	// res.setHeader(); // Should I set headers here? Like custom headers based on the handlers?
-	res.writeHead(ctx.statusCode, { 'Content-Type': 'application/json' });
+	let { res_payload } = ctx;
+	ctx.setContentLength(res_payload = JSON.stringify(res_payload));
+	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
+	ctx.res.end(res_payload);
+	return ctx; // To trigger the next .then method
 
-	// Convert res_payload to string and write it to the 'res' stream
-	// Should this JSON serialization be done in the handler function? Or done here?
-	// Maybe allow one more option in the handler to specify if they want the payload to be serialized
-	res.end(JSON.stringify(ctx.res_payload));
-	return ctx;
+	/* @TODO
+	How do I serialize res_payload and make it into a readable stream to pipe it into 'res' writable stream
+	Maybe allow one more option in the handler to specify if they want the payload to be serialized
+	Perhaps refactor this function out into a seperate module like what Express did	*/
 }

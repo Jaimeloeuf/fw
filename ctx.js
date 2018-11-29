@@ -14,10 +14,10 @@ var parsedUrl;
 	It exposes a easy to use and clean interface for passing data downstream in a middleware lifecycle,
 	with many commonly used built in methods.
 */
-/*	This is currently a Factory function for 'ctx' object
+/*	@TODO
+	This is currently a Factory function for 'ctx' object
 	Should I change this factory function into a Class,
 	with prototypes to extend its functionailty/capability
-	
 	Learn how to use function prototypes like below:
 	getCTX.prototype.req = req;
 */
@@ -49,6 +49,12 @@ module.exports.getCTX = (req, res) => {
 
 		// Setting Defaults for response object
 		statusCode: 200,
+		res_headers: {
+			'content-type': 'application/json',
+			'cache-control': 'no-cache',
+			'content-length': 0,
+		},
+		setContentLength: function(body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
 		res_payload: {}
 	};
 }

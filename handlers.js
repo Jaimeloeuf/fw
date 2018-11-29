@@ -6,10 +6,10 @@ const handler = {};
 handler.login = (ctx) => {
 	// if (async auth_db(headers.authentication)) {
 	// 	await ok();
-	// 	response.writeHead({ 'Set-cookie': `${cookie}; ${expiry_date};` })
+	// 	Add cookie to Headers of Response object
+	// 	ctx.res_headers.cookie = { 'Set-cookie': `${cookie}; ${expiry_date};` }
 	// 	next(307, { 'location': `/${location}` })
 	// }
-
 	return ctx; // To trigger the next .then method
 }
 // logout handler
@@ -28,6 +28,7 @@ handler.sample = (ctx) => {
 
 // Ping handler to see if server is up
 handler.ping = (ctx) => {
+	// Actually the statusCode does need to be set, as 200 is the default value
 	ctx.statusCode = 200; // Send back a HTTP code to indicate server is up
 	return ctx; // To trigger the next .then method
 };
