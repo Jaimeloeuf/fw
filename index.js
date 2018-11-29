@@ -34,7 +34,7 @@ http.createServer(unifiedServer)
 
 // unifiedServer used to handle requests from both the HTTP and HTTPS server in the future
 function unifiedServer(req, res) {
-	/*	Flow of logic:
+	/*	@DOC Flow of logic:
 		0. Parse req object with getCTX()
 		Promises Logic flow:
 		1. Get incoming req payload, when the getPayload Promise resolves after receiving full payload
@@ -58,6 +58,23 @@ function unifiedServer(req, res) {
 
 // This function is the final handler, also known as finalHandler in the Express world.
 function finalHandler(ctx) {
+	/*	@DOC Flow of logic in 'finalHandler':
+		- Serialize res_payload and store result in itself, a variable that is created on
+		destructuring the 'ctx' object. Only the variable is changed, meaning the value
+		in ctx.res_payload called directly is unaffected/unchanged.
+		- Set the content length in the response headers with the method from 'ctx' object.
+		- Sent the response headers and status code back to the client
+		- Sent the response payload back to client and close the connection. */
+
+	/*	Alternative method for setting headers, as node caches the headers internally
+		and not write them directly to the client, res.getHeaders() can be called
+		to see what are the headers set before sending them out. This method should
+		be used when you need to modify/access the headers after setting them. E.g.
+		when you set headers in a middleware but only use writeHead in the finalHandler */
+	// for (let header in res_headers)
+	// 	res.setHeader(header, res_headers[header]);
+	// res.writeHead(ctx.statusCode);
+
 	let { res_payload } = ctx;
 	ctx.setContentLength(res_payload = JSON.stringify(res_payload));
 	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
