@@ -34,15 +34,20 @@ const debug = {
 			write('-');
 	},
 	
-	logout_req_params(ctx) {
+	logout_params(ctx) {
 		// Debug middleware to log out details from ctx object
 		debug.console_lines(90);
+		// Items from Req obj
 		log(`\nRequested path: '${ctx.path}'`);
 		log(`Request method: '${ctx.method}'`);
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
 		log('Payload Received: ', ctx.req_payload);
-		log(`Returning this response: ${ctx.statusCode}, `, ctx.res_payload);
+		debug.console_lines(50);
+		// Items from Res obj
+		log(`\nResponse status code: ${ctx.statusCode}`);
+		log('Response Headers are = ', ctx.res_headers);
+		log('Response Payload is: ', ctx.res_payload);
 		return ctx; // Can be used to trigger next .then method, since it can be part of a .then chaining with other Promises
 	}
 };
