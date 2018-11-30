@@ -30,10 +30,10 @@ function log() {
 const debug = {
 	console_lines: (n) => {
 		// Print out 'n' number of dashes on the console, used to seperate stuff
-		while(--n) // A reverse while loop, more efficient than the old for loop
+		while (--n) // A reverse while loop, more efficient than the old for loop
 			write('-');
 	},
-	
+
 	logout_params(ctx) {
 		// Debug middleware to log out details from ctx object
 		debug.console_lines(90);
@@ -43,11 +43,16 @@ const debug = {
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
 		log('Payload Received: ', ctx.req_payload);
-		debug.console_lines(50);
+		debug.console_lines(60);
 		// Items from Res obj
 		log(`\nResponse status code: ${ctx.statusCode}`);
 		log('Response Headers are = ', ctx.res_headers);
 		log('Response Payload is: ', ctx.res_payload);
+		// Log Error if any.
+		if (ctx.error) {
+			debug.console_lines(60);
+			log('\nErrors in error array for current ctx:\n', ctx.error);
+		}
 		return ctx; // Can be used to trigger next .then method, since it can be part of a .then chaining with other Promises
 	},
 	error: (err) => log(err)

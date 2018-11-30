@@ -55,7 +55,12 @@ module.exports.getCTX = (req, res) => {
 			'cache-control': 'no-cache',
 			'content-length': 0,
 		},
-		setContentLength: function(body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
-		res_payload: {}
+		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
+		res_payload: {},
+
+		// Any middleware can add its error output to this error object which will be logged tgt at the end.
+		error: [],
+		// Method to push new error into the error array.
+		newError(err) { this.error.push(err); }
 	};
 }

@@ -3,6 +3,9 @@
 // Dependencies
 const { parse: urlencodedParser } = require('querystring');
 
+/*	@TODO
+	See if this function can be potentially memoized. Esp. the JSON parsing part
+*/
 module.exports = (ctx) => {
 	return new Promise((resolve, reject) => {
 		// Parse payload if any
@@ -10,13 +13,12 @@ module.exports = (ctx) => {
 			// Parse buffer if JSON format is specified
 			if (ctx.checkContentType('application/json')) {
 				try { ctx.req_payload = JSON.parse(ctx.req_payload); }
-				catch (error) { reject('ERROR: Parser cannot parse JSON'); }
+				catch (error) { return reject('ERROR: Parser cannot parse JSON'); }
 			}
 			else if (ctx.checkContentType('application/x-www-form-urlencoded'))
 				ctx.req_payload = urlencodedParser(ctx.req_payload); // Does this need try/catch too? Might throw error?
 			else
-				reject(`ERROR: Unknown content-type for payload received: ${ctx.headers["content-Type"]}`)
-
+				return reject(`ERROR: Unknown content-type for payload received: ${ctx.contentType}`);
 			resolve(ctx); // Resolve with 'ctx' for the next function in 'then' chaining
 		}
 	});
