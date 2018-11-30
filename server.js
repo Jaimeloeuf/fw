@@ -27,9 +27,6 @@ module.exports = (req, res) => {
 	// Create 'ctx' object with (req, res) objects
 	const ctx = getCTX(req, res);
 
-	// In promise land, the moment 1 promise rejects, then all the following .thens are skipped
-	// It goes straight to the trailing .catch instead
-
 	// Get payload and sequence all the Async code
 	// Meaning concurreny and parrallelism combined!
 	getPayload(ctx)
@@ -41,4 +38,6 @@ module.exports = (req, res) => {
 			ctx.newError(err);
 			debug.logout_params(ctx);
 		});
+	// In promise land, the moment 1 promise rejects, then all the following .thens are skipped
+	// It goes straight to the trailing .catch instead
 }

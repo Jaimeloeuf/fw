@@ -31,6 +31,7 @@ module.exports.getCTX = (req, res) => {
 		req: req,
 		res: res,
 
+
 		// Parsed url object
 		url: parsedUrl,
 		// Get the path. Remove / from the start and the end, but keep those in the middle.
@@ -47,7 +48,11 @@ module.exports.getCTX = (req, res) => {
 		checkContentType: (type) => type === req.headers["content-type"],
 		// Get the query string as an object
 		query: parsedUrl.query,
+		// Get the cookies in the headers
+		cookies: req.headers['cookies'],
+		// @TODO implement a method to deal with the cookies above.
 
+		
 		// Setting Defaults for response object
 		statusCode: 200,
 		res_headers: {
@@ -57,6 +62,14 @@ module.exports.getCTX = (req, res) => {
 		},
 		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
 		res_payload: {},
+
+
+		// @TODO to test and improve on the res_cookies below
+		res_cookies: [],
+		newCookie(cookie) {
+			this.res_cookies.push(cookie);
+		},
+
 
 		// Any middleware can add its error output to this error object which will be logged tgt at the end.
 		error: [],
