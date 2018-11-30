@@ -18,8 +18,8 @@ const { debug } = require('./utils');
 	5. Call finalHandler and send response back to user
 	
 	@TODO
-	Perhaps modify CTX agn by adding in a error object, for finalHandler to deal with
-	Problem is there is no more code that will run for a req after the 'catch' method
+	Add some features for finalHandler to deal with the error(s) in 'ctx' object
+	See if it is feasible to make the unifiedServer function into an async function, using async/await
 */
 
 // unifiedServer used to handle requests from both the HTTP and HTTPS server in the future
@@ -27,8 +27,8 @@ module.exports = (req, res) => {
 	// Create 'ctx' object with (req, res) objects
 	const ctx = getCTX(req, res);
 
-	// Get payload and sequence all the Async code
-	// Meaning concurreny and parrallelism combined!
+	// Call getPayload as the first Promise and sequence the other Async codes with Promise chaining
+	// Meaning concurreny and parrallelism? See more on this.
 	getPayload(ctx)
 		.then((ctx) => parser(ctx))
 		.then((ctx) => router(ctx)(ctx))
