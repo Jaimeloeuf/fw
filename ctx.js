@@ -8,13 +8,14 @@ const url = require('url');
 // Function can use this variable created at program startup by overwrite the value every single time
 var parsedUrl;
 
-/* @Doc Copying koa.js idea on using a ctx object
-	Where ctx is an object containing both the req and res objects,
-	and data parsed from those 'req,res' objects
-	It exposes a easy to use and clean interface for passing data downstream in a middleware lifecycle,
-	with many commonly used built in methods.
-*/
-/*	@TODO
+/* @Doc
+	Copying koa.js idea on using a ctx object
+	Where ctx is an object containing both the req and res objects and
+	data parsed from those 'req,res' objects.
+	It exposes a easy to use and clean interface for passing data downstream
+	in a middleware lifecycle, with many commonly used built in methods.
+
+	@TODO
 	This is currently a Factory function for 'ctx' object
 	Should I change this factory function into a Class,
 	with prototypes to extend its functionailty/capability

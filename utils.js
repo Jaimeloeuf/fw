@@ -49,7 +49,8 @@ const debug = {
 		log('Response Headers are = ', ctx.res_headers);
 		log('Response Payload is: ', ctx.res_payload);
 		return ctx; // Can be used to trigger next .then method, since it can be part of a .then chaining with other Promises
-	}
+	},
+	error: (err) => log(err)
 };
 
 module.exports = {
