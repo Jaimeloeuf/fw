@@ -4,8 +4,8 @@
 const url = require('url');
 
 /* Global var */
-// Create once, store many times. Prevent variable creation every single time getCTX method is called
-// Function can use this variable created at program startup by overwrite the value every single time
+/* Create once, store many times. Prevent variable creation every single time getCTX method is called
+Function can use this variable created at program startup by overwrite the value every single time */
 var parsedUrl;
 
 /* @Doc
@@ -31,7 +31,6 @@ module.exports.getCTX = (req, res) => {
 		req: req,
 		res: res,
 
-
 		// Parsed url object
 		url: parsedUrl,
 		// Get the path. Remove / from the start and the end, but keep those in the middle.
@@ -52,7 +51,6 @@ module.exports.getCTX = (req, res) => {
 		cookies: req.headers['cookies'],
 		// @TODO implement a method to deal with the cookies above.
 
-		
 		// Setting Defaults for response object
 		statusCode: 200,
 		res_headers: {
@@ -63,13 +61,11 @@ module.exports.getCTX = (req, res) => {
 		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
 		res_payload: {},
 
-
 		// @TODO to test and improve on the res_cookies below
 		res_cookies: [],
 		newCookie(cookie) {
 			this.res_cookies.push(cookie);
 		},
-
 
 		// Any middleware can add its error output to this error object which will be logged tgt at the end.
 		error: [],

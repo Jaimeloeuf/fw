@@ -1,3 +1,5 @@
+'use strict'; // Enforce use of strict verion of JavaScript
+
 // Version 1 of write, assumes that it must be a string an no error is made during usage
 const write = (str) => process.stdout.write(str);
 // Version 2 of write, currently Deperecated 'write' function below
@@ -53,7 +55,6 @@ const debug = {
 			debug.console_lines(60);
 			log('\nErrors in error array for current ctx:\n', ctx.error);
 		}
-		return ctx; // Can be used to trigger next .then method, since it can be part of a .then chaining with other Promises
 	},
 	error: (err) => log(err)
 };

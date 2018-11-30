@@ -26,6 +26,22 @@ handler.sample = (ctx) => {
 	return ctx; // To trigger the next .then method
 };
 
+// Example code below to test out the idea
+// Sample handler to test returning a Promise using 'ctx'
+handler.sample2 = (ctx) => {
+	// Send back a HTTP code and a 'res' payload
+	return new Promise((resolve, reject) => {
+		ctx.statusCode = 201;
+		ctx.res_payload = { 'handler name': 'sample handler' };
+		
+		// Call to DB...... need to wait
+		ctx.res_payload.data = db.getData(ctx.req_payload.userID);
+		if (ctx.res_payload.data) // If data is not undefined
+			return resolve(ctx); // To trigger the next .then method
+		return reject('ERROR: Cannot retrieve data from database, user dont exist');
+	});
+};
+
 // Ping handler to see if server is up
 handler.ping = (ctx) => {
 	// Actually the statusCode does need to be set, as 200 is the default value
