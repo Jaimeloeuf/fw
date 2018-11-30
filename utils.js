@@ -48,8 +48,8 @@ const debug = {
 		log(`\nResponse status code: ${ctx.statusCode}`);
 		log('Response Headers are = ', ctx.res_headers);
 		log('Response Payload is: ', ctx.res_payload);
-		// Log Error if any.
-		if (ctx.error) {
+		// Log Error if any
+		if (ctx.error.length) {
 			debug.console_lines(60);
 			log('\nErrors in error array for current ctx:\n', ctx.error);
 		}
