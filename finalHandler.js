@@ -3,23 +3,23 @@
 /*	This function is just like the finalHandler in the Express world.
 
 	@DOC Flow of logic in 'finalHandler':
-	- Serialize res_payload and store result in itself, a variable that is created on
+	- Serialize res_body and store result in itself, a variable that is created on
 	destructuring the 'ctx' object. Only the variable is changed, meaning the value
-	in ctx.res_payload called directly is unaffected/unchanged.
+	in ctx.res_body called directly is unaffected/unchanged.
 	- Set the content length in the response headers with the method from 'ctx' object.
 	- Sent the response headers and status code back to the client
 	- Sent the response payload back to client and close the connection.
 */
 /* @TODO
-	How do I serialize res_payload and make it into a readable stream to pipe it into 'res' writable stream
+	How do I serialize res_body and make it into a readable stream to pipe it into 'res' writable stream
 	Maybe allow one more option in the handler to specify if they want the payload to be serialized
 */
 
 module.exports = (ctx) => {
-	let { res_payload } = ctx;
-	ctx.setContentLength(res_payload = JSON.stringify(res_payload));
+	let { res_body } = ctx;
+	ctx.setContentLength(res_body = JSON.stringify(res_body));
 	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
-	ctx.res.end(res_payload);
+	ctx.res.end(res_body);
 	return ctx; // To trigger the next .then method
 }
 

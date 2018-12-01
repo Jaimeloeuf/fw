@@ -59,7 +59,7 @@ module.exports.getCTX = (req, res) => {
 			'content-length': 0,
 		},
 		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
-		res_payload: {},
+		res_body: {},
 
 		// @TODO to test and improve on the res_cookies below
 		res_cookies: [],

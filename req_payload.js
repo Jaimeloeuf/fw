@@ -14,9 +14,9 @@ module.exports = (ctx) => {
 			.on('end', () => {
 				// If no payload, then 'end' event is fired immediately
 				if (buffer)
-					ctx.req_payload = buffer + decoder.end(); // Flush out decoder buffer if 'buffer' not null
+					ctx.req_body = buffer + decoder.end(); // Flush out decoder buffer if 'buffer' not null
 				else
-					ctx.req_payload = undefined; // Make sure that req_payload is undefined if current buffer is empty
+					ctx.req_body = undefined; // Make sure that req_body is undefined if current buffer is empty
 				resolve(ctx); // Resolve with 'ctx' for the next function in 'then' chaining
 			});
 	});

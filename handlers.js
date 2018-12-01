@@ -22,7 +22,7 @@ handler.logout = (ctx) => {
 handler.sample = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
 	ctx.statusCode = 201;
-	ctx.res_payload = { 'handler name': 'sample handler' };
+	ctx.res_body = { 'handler name': 'sample handler' };
 	return ctx; // To trigger the next .then method
 };
 
@@ -32,11 +32,11 @@ handler.sample2 = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
 	return new Promise((resolve, reject) => {
 		ctx.statusCode = 201;
-		ctx.res_payload = { 'handler name': 'sample handler' };
+		ctx.res_body = { 'handler name': 'sample handler' };
 		
 		// Call to DB...... need to wait
-		ctx.res_payload.data = db.getData(ctx.req_payload.userID);
-		if (ctx.res_payload.data) // If data is not undefined
+		ctx.res_body.data = db.getData(ctx.req_payload.userID);
+		if (ctx.res_body.data) // If data is not undefined
 			return resolve(ctx); // To trigger the next .then method
 		return reject('ERROR: Cannot retrieve data from database, user dont exist');
 	});

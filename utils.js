@@ -44,12 +44,12 @@ const debug = {
 		log(`Request method: '${ctx.method}'`);
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
-		log('Payload Received: ', ctx.req_payload);
+		log('Request Body: ', ctx.req_body);
 		debug.console_lines(60);
 		// Items from Res obj
 		log(`\nResponse status code: ${ctx.statusCode}`);
 		log('Response Headers are = ', ctx.res_headers);
-		log('Response Payload is: ', ctx.res_payload);
+		log('Response Body: ', ctx.res_body);
 		// Log Error if any
 		if (ctx.error.length) {
 			debug.console_lines(60);
