@@ -44,7 +44,8 @@ const debug = {
 		log(`Request method: '${ctx.method}'`);
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
-		log('Request Body: ', ctx.req_body);
+		if (ctx.req_body)	// Log req_body if any
+			log('Request Body: ', ctx.req_body);
 		debug.console_lines(60);
 		// Items from Res obj
 		log(`\nResponse status code: ${ctx.statusCode}`);

@@ -54,9 +54,9 @@ module.exports.getCTX = (req, res) => {
 		// Setting Defaults for response object
 		statusCode: 200,
 		res_headers: {
-			'content-type': 'application/json',
-			'cache-control': 'no-cache',
-			'content-length': 0,
+			'content-type': 'application/json', // Default response of API server should be in JSON
+			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
+			'content-length': 0, // MUST be set by finalHandler else client will hang as it waits for the server
 		},
 		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
 		res_body: {},
