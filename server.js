@@ -34,6 +34,7 @@ module.exports = (req, res) => {
 	// Create a new 'ctx' object with (req, res) objects
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 	console.time('Cycle time'); // For dev-env only
+	let time = process.hrtime();
 	const ctx = getCTX(req, res);
 
 	// Promise Chaining to respond back to client
@@ -45,6 +46,14 @@ module.exports = (req, res) => {
 		.finally(() => {
 			debug.logout_params(ctx)
 			console.timeEnd('Cycle time'); // For dev-env only
+			time = process.hrtime(time); // Get time diff
+			time = time[0] * 1000000 + time[1] / 1000; // Get time into ms format
+			arr.push(time); // Add time to the array
 		})
 		.catch((err) => console.error(err));
+
+	if (arr.length === 20) // Set this val to the same one in siege to plot the data
+		console.log(arr);
 }
+
+var arr = []; // Used to store the time to see resp time...
