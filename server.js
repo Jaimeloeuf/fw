@@ -33,6 +33,7 @@ const { debug } = require('./utils');
 module.exports = (req, res) => {
 	// Create a new 'ctx' object with (req, res) objects
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+	console.time('Cycle time'); // For dev-env only
 	const ctx = getCTX(req, res);
 
 	// Promise Chaining to respond back to client
@@ -41,6 +42,9 @@ module.exports = (req, res) => {
 		.then((ctx) => router(ctx)(ctx))
 		.then((ctx) => finalHandler(ctx))
 		.catch((err) => ctx.newError(err))
-		.finally(() => debug.logout_params(ctx))
+		.finally(() => {
+			debug.logout_params(ctx)
+			console.timeEnd('Cycle time'); // For dev-env only
+		})
 		.catch((err) => console.error(err));
 }
