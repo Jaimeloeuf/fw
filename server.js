@@ -30,7 +30,12 @@ const { debug } = require('./utils');
 	See if it is feasible to make the unifiedServer function into an async function, using async/await
 
 	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.	*/
+
+var reqCount = 0;
+
 module.exports = (req, res) => {
+	console.log(++reqCount);
+
 	// Create a new 'ctx' object with (req, res) objects
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 	console.time('Cycle time'); // For dev-env only
