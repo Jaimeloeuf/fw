@@ -5,6 +5,12 @@ to set environmental variables.
 $env:NODE_ENV="production"
 ```
 
+To Change memory limit/use of the node process, use the below code and change 1024 to desired memory size in MB
+```bash
+node --max-old-space-size=1024 .\index.js
+```
+
+
 #API
 ```js
 

@@ -5,11 +5,15 @@ const http = require('http');
 const unifiedServer = require('./server');
 const { env } = require('./config');
 const { log } = require('./utils');
+const v8 = require('v8'); // Used to see memory usage
 
 /* @TODO
 	Perhaps add the process.on uncaught error? or process.on exit?
 	ALso learn how to use process.nextTick() for seeing performance and to help with optimization
 */
+
+// Convert avail memory from bytyes to Gigabytes and round to 2 d.p.
+log(`The total memory for this process is: ${(v8.getHeapStatistics().total_available_size / 1024 / 1024 / 1024).toFixed(2)}GB`);
 
 http.createServer(unifiedServer)
 	.listen(env.port, (err) => {

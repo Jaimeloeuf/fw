@@ -52,7 +52,7 @@ module.exports = (req, res) => {
 		})
 		.catch((err) => console.error(err));
 
-	if (arr.length === 20) // Set this val to the same one in siege to plot the data
+	if (arr.length === 200) // Set this val to the same one in siege to plot the data
 		console.log(arr);
 }
 
