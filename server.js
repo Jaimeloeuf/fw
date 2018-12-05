@@ -8,6 +8,9 @@ const router = require('./router');
 const finalHandler = require('./finalHandler');
 const { debug } = require('./utils');
 
+// Convert avail memory from bytyes to MB and round to 2 d.p.
+console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
+
 /* 	@Doc Flow of logic:
 	0. Parse req object with getCTX()
 	0.1. All async codes are sequenced with Promise chaining
@@ -29,9 +32,10 @@ const { debug } = require('./utils');
 	Add some features for finalHandler to deal with the error(s) in 'ctx' object
 	See if it is feasible to make the unifiedServer function into an async function, using async/await
 
-	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.	*/
+	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.
+*/
 
-var reqCount = 0;
+var reqCount = 0; // Global variable to track number of requests received.
 
 module.exports = (req, res) => {
 	// Create a new 'ctx' object with (req, res) objects
@@ -47,20 +51,11 @@ module.exports = (req, res) => {
 		.then((ctx) => finalHandler(ctx))
 		.catch((err) => ctx.newError(err))
 		.finally(() => {
-			debug.logout_params(ctx)
-			console.timeEnd('Cycle time'); // For dev-env only
-			// time = process.hrtime(time); // Get time diff
-			// time = (time[0] * 1e9 + time[1]) / 1e6; // Get time into ms format
-			// arr.push(time); // Add time to the array
+			debug.logout_params(ctx);
+			// For dev-env only
+			console.timeEnd('Cycle time');
 			console.log(`Servicing req number: ${++reqCount}`);
+			console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
 		})
 		.catch((err) => console.error(err));
-
-	// console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024 / 1024).toFixed(2)); // In GB
-	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
-
-	// if (arr.length === 200) // Set this val to the same one in siege to plot the data
-	// 	console.log(arr);
 }
-
-// var arr = []; // Used to store the time to see resp time...
