@@ -34,8 +34,6 @@ const { debug } = require('./utils');
 var reqCount = 0;
 
 module.exports = (req, res) => {
-	console.log(++reqCount);
-
 	// Create a new 'ctx' object with (req, res) objects
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 	console.time('Cycle time'); // For dev-env only
@@ -52,13 +50,14 @@ module.exports = (req, res) => {
 			debug.logout_params(ctx)
 			console.timeEnd('Cycle time'); // For dev-env only
 			// time = process.hrtime(time); // Get time diff
-			// time = time[0] * 1000000 + time[1] / 1000; // Get time into ms format
+			// time = (time[0] * 1e9 + time[1]) / 1e6; // Get time into ms format
 			// arr.push(time); // Add time to the array
+			console.log(`Servicing req number: ${++reqCount}`);
 		})
 		.catch((err) => console.error(err));
 
-	console.log((process.memoryUsage().rss / 1024 / 1024 / 1024).toFixed(2));
-
+	// console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024 / 1024).toFixed(2)); // In GB
+	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
 
 	// if (arr.length === 200) // Set this val to the same one in siege to plot the data
 	// 	console.log(arr);

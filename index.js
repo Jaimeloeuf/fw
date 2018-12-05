@@ -12,8 +12,11 @@ const v8 = require('v8'); // Used to see memory usage
 	ALso learn how to use process.nextTick() for seeing performance and to help with optimization
 */
 
+// let val = v8.getHeapStatistics().total_available_size;
+let val = v8.getHeapStatistics().total_heap_size;
 // Convert avail memory from bytyes to Gigabytes and round to 2 d.p.
-log(`The total memory for this process is: ${(v8.getHeapStatistics().total_available_size / 1024 / 1024 / 1024).toFixed(2)}GB`);
+log(`The total memory for this process is: ${(val / 1024 / 1024 / 1024).toFixed(2)}GB`);
+log(v8.getHeapStatistics());
 
 // http.createServer(unifiedServer)
 // 	.listen(env.port, (err) => {
@@ -43,3 +46,6 @@ http.createServer(unifiedServer)
 	})
 
 process.on('beforeExit', (code) => log(`The exit code caught is ${code}`));
+process.on('exit', (code) => log('Exiting with code: ', code));
+process.on('SIGABRT', (signal) => log(signal));
+process.on('uncaughtException', (error) => console.error(error));
