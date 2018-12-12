@@ -1,5 +1,11 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
+/*	@Doc Module description:
+	This module contains all the defintions for generic handlers for the router to call, and it also imports
+	all the other handlers in their seperate modules like the 'auth' handler / module, in order to create the
+	handlers object and export all of it as one handler object to the router.
+*/
+
 const handler = {};
 
 handler.user = (ctx) => {
@@ -21,27 +27,6 @@ var _user = {
 	}
 };
 
-// Authenticate a token or username + password??
-// This is more like a username + password than a auth token way already
-const authenticate = (user) => {
-	// 1) Should return a true or false indicating success or failure of Auth OR,
-	// 2) Call the next mw / callback in the cycle if success and reject if failure
-
-	return new Promise((resolve, reject) => {
-		/* 
-			query db for user with the given username.
-			if db returns user object or interface to read the user object in database
-			call hashing method in the child process/worker to hash the given password.
-			since abv method will be a 'await' call, when it returns, check if
-			the hash matches the hash from the userObj from the DB exactly
-
-			resolve if matches, and have a promise chain that allows thenables and
-			call the next 'middleware'
-		*/
-		
-	});
-};
-
 // Login handler
 handler.login = (ctx) => {
 	// if (async auth_db(headers.authentication)) {
@@ -57,16 +42,6 @@ handler.logout = (ctx) => {
 
 	return ctx; // To trigger the next .then method
 };
-
-// Search API handler
-handler.search = () => {
-	/*
-		Assumes that the incoming request in formulated nicely
-		OR,
-		pass the incoming request through a pure funcion, where it is smth like ctx module that will extract all
-		info about the search request out in a nice format for processing.
-	*/
-}
 
 // Sample handler using 'ctx'
 handler.sample = (ctx) => {
