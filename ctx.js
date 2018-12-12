@@ -26,6 +26,9 @@ module.exports.getCTX = (req, res) => {
 	// Get URL and parse it, parse query strings if any in url
 	parsedUrl = url.parse(req.url, true);
 
+	// @TODO create a new Header parser module that parses the request heaeders and returns its value to ctx module
+	// h = getHeaders(req);
+
 	// Construct and return ctx object
 	return {
 		req: req,
@@ -39,8 +42,9 @@ module.exports.getCTX = (req, res) => {
 		method: req.method.toUpperCase(),
 		// Get headers as an object
 		headers: req.headers,
+		// headers: h.headers,
 		// User Agent header for analytics
-		// userAgent: req.headers['user-agent'];
+		
 		// Get the contentType of the incoming req payload, to be used for parsing the payload
 		contentType: req.headers["content-type"],
 		// Method to check if content-type of incoming req payload is equals to given type
