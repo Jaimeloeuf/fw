@@ -22,6 +22,31 @@ One of the routers should be for when the routes specified within, handles all r
 ^ Think through the above again to see if it is logical, for stricter API request control, shouldn't I clearly seperate all the things base on their request method and not allow stray random reqest methods / requests with wrong request method go through?
 */
 
+// Code below are a tmp testing implementation of the above idea. To work on further.
+// The module exports has been commented out for now to prevent module call conflict
+const GET = {
+	'sample': handler.sample,
+	'ping': handler.ping
+}
+
+const POST = {
+	'login': handler.login,
+	'logout': handler.logout
+}
+
+const PUT = {
+}
+
+const DEL = {
+}
+
+// module.exports = {
+// 	GET: GET,
+// 	POST: POST,
+// 	PUT: PUT,
+// 	DEL: DEL
+// }
+
 
 // Check the router object/hashmap with route for a handler.
 // If none defined, use the notFound handler.
