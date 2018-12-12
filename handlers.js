@@ -35,7 +35,8 @@ const authenticate = (user) => {
 			since abv method will be a 'await' call, when it returns, check if
 			the hash matches the hash from the userObj from the DB exactly
 
-			resolve if matches, and call the
+			resolve if matches, and have a promise chain that allows thenables and
+			call the next 'middleware'
 		*/
 		
 	});
@@ -56,6 +57,16 @@ handler.logout = (ctx) => {
 
 	return ctx; // To trigger the next .then method
 };
+
+// Search API handler
+handler.search = () => {
+	/*
+		Assumes that the incoming request in formulated nicely
+		OR,
+		pass the incoming request through a pure funcion, where it is smth like ctx module that will extract all
+		info about the search request out in a nice format for processing.
+	*/
+}
 
 // Sample handler using 'ctx'
 handler.sample = (ctx) => {
