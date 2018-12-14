@@ -3,27 +3,7 @@
 // Dependencies
 const handler = require('./handlers');
 
-// Define the request router
-const router = {
-	'sample': handler.sample,
-	'ping': handler.ping,
-	'login': handler.login,
-	'logout': handler.logout,
-};
-// const router = new Map([
-// 	['login', handlers.login],
-// 	['logout', handlers.logout],
-// ]);
-
-/*
-Perhaps I should have different routers for different request methods as for the same route, different request methods should be handled differently, ideally with different route handlers.
-
-One of the routers should be for when the routes specified within, handles all requests for that route the same way regardless of request method.
-^ Think through the above again to see if it is logical, for stricter API request control, shouldn't I clearly seperate all the things base on their request method and not allow stray random reqest methods / requests with wrong request method go through?
-*/
-
-// Code below are a tmp testing implementation of the above idea. To work on further.
-// The module exports has been commented out for now to prevent module call conflict
+// Routers for different request method named as such
 const GET = {
 	'sample': handler.sample,
 	'ping': handler.ping
@@ -40,14 +20,30 @@ const PUT = {
 const DEL = {
 }
 
-// module.exports = {
-// 	GET: GET,
-// 	POST: POST,
-// 	PUT: PUT,
-// 	DEL: DEL
-// }
+// 'Routers' object to store all the routers for different request methods
+const routers = {
+	GET: GET,
+	POST: POST,
+	PUT: PUT,
+	DEL: DEL
+}
 
+var router; // Global variable, 'create once and use many times' for below
+module.exports = (ctx) => {
+	// Get a router based on the request method
+	router = routers[ctx.method];
+	/* If the request method is valid with a valid router
+	Check the router object/hashmap with the request route for a handler.
+	If none defined, use the notFound handler. */
+	if (router)
+		return router[ctx.path] ? router[ctx.path] : handler.notFound;
+	// If no such router for request method, use the invalidReqMethod handler to deal with the request.
+	return handler.invalidReqMethod;
+};
 
-// Check the router object/hashmap with route for a handler.
-// If none defined, use the notFound handler.
-module.exports = (ctx) => router[ctx.path] ? router[ctx.path] : handler.notFound;
+/* Hashmap implementation of the router.
+@TODO test to see which one is better, object or hashmap? for further optimization in the future */
+// const router = new Map([
+// 	['login', handlers.login],
+// 	['logout', handlers.logout],
+// ]);
