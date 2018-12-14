@@ -76,7 +76,13 @@ handler.ping = (ctx) => {
 
 // Not found handler
 handler.notFound = (ctx) => {
-	ctx.statusCode = 404; // Send back a HTTP code to indicate route not defined
+	ctx.statusCode = 404; // Send back the HTTP code to indicate route not defined
+	return ctx; // To trigger the next .then method
+};
+
+// Invalid request Method handler
+handler.invalidReqMethod = (ctx) => {
+	ctx.statusCode = 501; // Send back the HTTP code to indicate request method not accepted
 	return ctx; // To trigger the next .then method
 };
 
