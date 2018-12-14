@@ -60,6 +60,38 @@ const debug = {
 	error: (err) => log(err)
 };
 
+const { envName } = env;
+if (envName === 'production') {
+	console.log = () => {};
+}
+
+const debug = {
+	logout_params(ctx) {
+		if (env.envName === 'production')
+			return;
+		// Debug middleware to log out details from ctx object
+		debug.console_lines(90);
+		// Items from Req obj
+		log(`\nRequested path: '${ctx.path}'`);
+		log(`Request method: '${ctx.method}'`);
+		log('Queries received in url = ', ctx.query);
+		log('Headers received = ', ctx.headers);
+		if (ctx.req_body)	// Log req_body if any
+			log('Request Body: ', ctx.req_body);
+		debug.console_lines(60);
+		// Items from Res obj
+		log(`\nResponse status code: ${ctx.statusCode}`);
+		log('Response Headers are = ', ctx.res_headers);
+		log('Response Body: ', ctx.res_body);
+		// Log Error if any
+		if (ctx.error.length) {
+			debug.console_lines(60);
+			log('\nErrors in error array for current ctx:\n', ctx.error);
+		}
+	},
+	error: (err) => log(err)
+};
+
 module.exports = {
 	log: log,
 	debug: debug
