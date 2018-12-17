@@ -3,7 +3,7 @@
 // Dependencies
 const { getCTX } = require('./ctx');
 const getPayload = require('./req_payload');
-const parser = require('./parser');
+const bodyParser = require('./body_parser');
 const router = require('./router');
 const finalHandler = require('./finalHandler');
 const { debug } = require('./utils');
@@ -46,7 +46,7 @@ module.exports = (req, res) => {
 
 	// Promise Chaining to respond back to client
 	getPayload(ctx)
-		.then((ctx) => parser(ctx))
+		.then((ctx) => bodyParser(ctx))
 		.then((ctx) => router(ctx)(ctx))
 		.then((ctx) => finalHandler(ctx))
 		.catch((err) => ctx.newError(err))
