@@ -38,7 +38,7 @@ const log = (dat) => console.log(dat);
 handler.login = (ctx) => {
 	// Do the db shit then get back the user to create token. To refactor the create token code too.
 	return new Promise((resolve, reject) => {
-		jwt.sign({ user }, 'secretkey', { expiresIn: '40s' }, (err, token) => {
+		jwt.sign({ user }, 'secretkey', { expiresIn: '1000s' }, (err, token) => {
 			if (err)
 				reject(err);
 			// ctx.res.write(JSON.stringify(token));
@@ -50,17 +50,19 @@ handler.login = (ctx) => {
 };
 
 handler.user = (ctx) => {
-	getToken(ctx);
+	getToken(ctx); // Sync call to get the token out of headers
 	return new Promise((resolve, reject) => {
 		jwt.verify(ctx.token, 'secretkey', (err, authData) => {
 			if (err) {
-				ctx.res.statusCode = 403; // Forbidden
-				reject(err);
+				ctx.statusCode = 403; // Forbidden
+				ctx.res_body.error = 'Forbidden, invalid auth';
+				// reject(err); // Don't reject as it is not a code/logic error, but a user error
+				resolve(ctx);
 			}
-
 			else {
+				// Send back the details the client requested for
 				ctx.res_body.message = 'Post created...';
-				ctx.res_body.authData = authData;
+				ctx.res_body.authData = authData; // Probs not going to send this back to the user
 				resolve(ctx);
 			}
 		});
@@ -68,19 +70,15 @@ handler.user = (ctx) => {
 	})
 }
 
-
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
 function getToken(ctx) {
-	const bearerHeader = ctx.headers['Authorization']; // Get auth header value
-
+	const bearerHeader = ctx.headers['authorization']; // Get auth header value
 	if (typeof bearerHeader === 'undefined') // Check if bearer is undefined
 		ctx.res.statusCode = 403; // Forbidden
-
 	const bearerToken = bearerHeader.split(' ')[1]; // Split at the space and Get token from array
 	ctx.token = bearerToken; // Set the token
 }
-
 
 // Login handler
 // handler.login = (ctx) => {
