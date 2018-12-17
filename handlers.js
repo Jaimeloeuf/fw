@@ -6,37 +6,92 @@
 	handlers object and export all of it as one handler object to the router.
 */
 
+// Dependencies
+const jwt = require('jsonwebtoken');
+
 const handler = {};
-
-handler.user = (ctx) => {
-
-};
 
 var _user = {
 	'GET': (ctx) => {
 
 	},
 	'POST': (ctx) => {
-		
+
 	},
 	'PUT': (ctx) => {
-		
+
 	},
 	'DEL': (ctx) => {
-		
+
 	}
 };
 
-// Login handler
+// Mock user
+const user = {
+	id: 1,
+	username: 'brad',
+	email: 'brad@gmail.com'
+}
+
+const log = (dat) => console.log(dat);
+
 handler.login = (ctx) => {
-	// if (async auth_db(headers.authentication)) {
-	// 	await ok();
-	// 	Add cookie to Headers of Response object
-	// 	ctx.res_headers.cookie = { 'Set-cookie': `${cookie}; ${expiry_date};` }
-	// 	next(307, { 'location': `/${location}` })
-	// }
-	return ctx; // To trigger the next .then method
+	// Do the db shit then get back the user to create token. To refactor the create token code too.
+	return new Promise((resolve, reject) => {
+		jwt.sign({ user }, 'secretkey', { expiresIn: '40s' }, (err, token) => {
+			if (err)
+				reject(err);
+			// ctx.res.write(JSON.stringify(token));
+			// ctx.res.setHeader({Auth: token});
+			ctx.res_body.token = token; // Write token to response body to be sent back in the finalHandler
+			resolve(ctx);
+		});
+	});
 };
+
+handler.user = (ctx) => {
+	getToken(ctx);
+	return new Promise((resolve, reject) => {
+		jwt.verify(ctx.token, 'secretkey', (err, authData) => {
+			if (err) {
+				ctx.res.statusCode = 403; // Forbidden
+				reject(err);
+			}
+
+			else {
+				ctx.res_body.message = 'Post created...';
+				ctx.res_body.authData = authData;
+				resolve(ctx);
+			}
+		});
+
+	})
+}
+
+
+// FORMAT OF TOKEN
+// Authorization: Bearer <access_token>
+function getToken(ctx) {
+	const bearerHeader = ctx.headers['Authorization']; // Get auth header value
+
+	if (typeof bearerHeader === 'undefined') // Check if bearer is undefined
+		ctx.res.statusCode = 403; // Forbidden
+
+	const bearerToken = bearerHeader.split(' ')[1]; // Split at the space and Get token from array
+	ctx.token = bearerToken; // Set the token
+}
+
+
+// Login handler
+// handler.login = (ctx) => {
+// 	// if (async auth_db(headers.authentication)) {
+// 	// 	await ok();
+// 	// 	Add cookie to Headers of Response object
+// 	// 	ctx.res_headers.cookie = { 'Set-cookie': `${cookie}; ${expiry_date};` }
+// 	// 	next(307, { 'location': `/${location}` })
+// 	// }
+// 	return ctx; // To trigger the next .then method
+// };
 // logout handler
 handler.logout = (ctx) => {
 
@@ -58,7 +113,7 @@ handler.sample2 = (ctx) => {
 	return new Promise((resolve, reject) => {
 		ctx.statusCode = 201;
 		ctx.res_body = { 'handler name': 'sample handler' };
-		
+
 		// Call to DB...... need to wait
 		ctx.res_body.data = db.getData(ctx.req_payload.userID);
 		if (ctx.res_body.data) // If data is not undefined

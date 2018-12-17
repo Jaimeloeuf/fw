@@ -6,7 +6,8 @@ const handler = require('./handlers');
 // Routers for different request method named as such
 const GET = {
 	'sample': handler.sample,
-	'ping': handler.ping
+	'ping': handler.ping,
+	'user': handler.user
 }
 
 const POST = {
