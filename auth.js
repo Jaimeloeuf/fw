@@ -24,7 +24,7 @@ const authenticate = (user) => {
 			resolve if matches, and have a promise chain that allows thenables and
 			call the next 'middleware'
 		*/
-		
+
 	});
 };
 
@@ -42,16 +42,24 @@ const user = {
 const log = (dat) => console.log(dat);
 
 
-
+/* TO seperate this out into a JWT module, so auth Module deals with
+	BCrypt and child process to hash and verify usernames plus passwords,
+	while JWT module is in charge of the cookie/JWT action after the
+	initial password authentication.
+	
+	Perhaps the JWT module can have child processes too, to deal with the
+	parsing and signing as it seems like it will take quite abit of CPU power
+	
+	Also look into private Keys and stuff like Asymmetric signing and verifying */
 module.exports.createToken = (ctx) => {
 	// Do the db shit then get back the user to create token. To refactor the create token code too.
 	return new Promise((resolve, reject) => {
-		jwt.sign({ user }, 'secretkey', { expiresIn: '1000s' }, (err, token) => {
+		jwt.sign({ user }, 'secretkey', { expiresIn: '100s' }, (err, token) => {
 			if (err)
 				reject(err);
-			// ctx.res.write(JSON.stringify(token));
-			// ctx.res.setHeader({Auth: token});
-			ctx.res_body.token = token; // Write token to response body to be sent back in the finalHandler
+
+			// Write token into a cookie for finalHandler to send back to client
+			// How do I erase the previously issused cookie stored on the client?
 			ctx.res_headers['Set-Cookie'] = token;
 			resolve(ctx);
 		});
@@ -82,26 +90,11 @@ module.exports.verify = (ctx) => {
 
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
-var header;
-// function getToken(ctx) {
-// 	header = ctx.headers['authorization']; // Get auth header value
-// 	if (header === 'undefined')
-// 		log('hi')
-// 	if (typeof header === 'undefined') // Check if bearer is undefined
-// 		ctx.statusCode = 403; // Forbidden
-// 	const bearerToken = bearerHeader.split(' ')[1]; // Split at the space and Get token from array
-// 	ctx.token = bearerToken; // Set the token
-// }
-
 function getToken(ctx) {
-	return new Promise((resolve, reject) => {
-		header = ctx.headers['authorization']; // Get auth header value
-		if (header === 'undefined')
-			reject('No auth header found');
-		if (typeof header === 'undefined') // Check if bearer is undefined
-			ctx.statusCode = 403; // Forbidden
-		const bearerToken = header.split(' ')[1]; // Split at the space and Get token from array
-		ctx.token = bearerToken; // Set the token
-		resolve(ctx);
-	});
+	ctx.token = ctx.headers['authorization'].split(' ')[1]; // Split at the space and Get token from array
+	if (typeof ctx.token === 'undefined') // Check if bearer is undefined
+		ctx.statusCode = 403; // Forbidden
+	
+	// if (ctx.token === undefined) // Check if bearer is undefined
+	// 	ctx.statusCode = 403; // Forbidden
 }

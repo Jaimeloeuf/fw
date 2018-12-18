@@ -11,21 +11,6 @@ const { createToken, verify } = require('./auth');
 
 const handler = {};
 
-var _user = {
-	'GET': (ctx) => {
-
-	},
-	'POST': (ctx) => {
-
-	},
-	'PUT': (ctx) => {
-
-	},
-	'DEL': (ctx) => {
-
-	}
-};
-
 handler.login = (ctx) => {
 	return createToken(ctx);
 };
