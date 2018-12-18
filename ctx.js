@@ -54,6 +54,39 @@ module.exports.getCTX = (req, res) => {
 		// Get the cookies in the headers
 		cookies: req.headers['cookies'],
 		// @TODO implement a method to deal with the cookies above.
+		auth: req.headers['authorization'],
+		_cookie: () => {
+			cookie_list = req.headers['cookie'];
+			cookie_list = cookie_list.split('=');
+			let cookies;
+			for(let i = 0; i<cookie_list.length; i+=2) {
+				let val = cookie_list[i+1].split(';');
+				cookies[cookie_list[i]] = {
+					val = val[0],
+					secure: false,
+					httponly: false,
+					exp: 100000000
+				}
+				for(let j = 0; j<val.length; j++) {
+					let dat = val[j].toLowerCase();
+					switch(dat) {
+						case 'secure':
+							cookies[cookie_list[i]].secure = true;
+							break;
+						case 'httponly':
+							cookies[cookie_list[i]].httponly = true;
+							break;
+						case 'exp':
+
+						default:
+							log('Invalid param for cookies');
+					}
+				}
+			}
+		},
+
+		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
+
 
 		// Setting Defaults for response object
 		statusCode: 200,
