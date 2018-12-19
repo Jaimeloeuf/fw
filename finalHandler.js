@@ -13,6 +13,7 @@
 /* @TODO
 	How do I serialize res_body and make it into a readable stream to pipe it into 'res' writable stream
 	Maybe allow one more option in the handler to specify if they want the payload to be serialized
+	Include something to deal with all the errors. Like send them back to the client or log them
 */
 
 module.exports = (ctx) => {

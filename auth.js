@@ -10,6 +10,14 @@
 	- Search how to use Node JS Child processes / Clusters to do authentication on another 'thread'
 */
 
+// Test function to make sure 'crypto' support is avail on current machine.
+var crypto;
+try {
+	crypto = require('crypto');
+} catch (err) {
+	log('crypto support is disabled!');
+}
+
 // Authenticate username + password only. Does not deal with tokens here
 const authenticate = (user) => {
 	// 1) Should return a true or false indicating success or failure of Auth OR,
