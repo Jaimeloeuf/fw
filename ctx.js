@@ -44,7 +44,7 @@ module.exports.getCTX = (req, res) => {
 		headers: req.headers,
 		// headers: h.headers,
 		// User Agent header for analytics
-		
+
 		// Get the contentType of the incoming req payload, to be used for parsing the payload
 		contentType: req.headers["content-type"],
 		// Method to check if content-type of incoming req payload is equals to given type
@@ -52,39 +52,9 @@ module.exports.getCTX = (req, res) => {
 		// Get the query string as an object
 		query: parsedUrl.query,
 		// Get the cookies in the headers
-		cookies: req.headers['cookies'],
+		cookies: getCookies(req.headers['cookie']),
 		// @TODO implement a method to deal with the cookies above.
 		auth: req.headers['authorization'],
-		_cookie: () => {
-			cookie_list = req.headers['cookie'];
-			cookie_list = cookie_list.split('=');
-			let cookies;
-			for(let i = 0; i<cookie_list.length; i+=2) {
-				let val = cookie_list[i+1].split(';');
-				cookies[cookie_list[i]] = {
-					val = val[0],
-					secure: false,
-					httponly: false,
-					exp: 100000000
-				}
-				for(let j = 0; j<val.length; j++) {
-					let dat = val[j].toLowerCase();
-					switch(dat) {
-						case 'secure':
-							cookies[cookie_list[i]].secure = true;
-							break;
-						case 'httponly':
-							cookies[cookie_list[i]].httponly = true;
-							break;
-						case 'exp':
-
-						default:
-							log('Invalid param for cookies');
-					}
-				}
-			}
-		},
-
 		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
 
 
@@ -109,4 +79,34 @@ module.exports.getCTX = (req, res) => {
 		// Method to push new error into the error array.
 		newError(err) { this.error.push(err); }
 	};
+}
+
+// Returns an object with all the cookies
+function getCookies(cookie) {
+	cookie = cookie.split('=');
+	let cookies;
+	for (let i = 0; i < cookie.length; i += 2) {
+		let val = cookie[i + 1].split(';');
+		cookies[cookie[i]] = {
+			val = val[0],
+			secure: false,
+			httponly: false,
+			exp: 100000000
+		}
+		for (let j = 0; j < val.length; j++) {
+			let dat = val[j].toLowerCase();
+			switch (dat) {
+				case 'secure':
+					cookies[cookie[i]].secure = true;
+					break;
+				case 'httponly':
+					cookies[cookie[i]].httponly = true;
+					break;
+				case 'exp':
+
+				default:
+					log('Invalid param for cookies');
+			}
+		}
+	}
 }
