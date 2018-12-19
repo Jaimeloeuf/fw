@@ -33,6 +33,11 @@ console.log(`Total memory for process: ${(require('v8').getHeapStatistics().tota
 	See if it is feasible to make the unifiedServer function into an async function, using async/await
 
 	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.
+
+	To update this module to fix the Promise waterfall. Make it so that 'finally' is where I handle both
+	responses to client, and errors that should be sent back to the client.
+	I can totally use async/await on getCTX, so that I can do the chaining thing better as .catch method
+	does not resolve back ctx.
 */
 
 var reqCount = 0; // Global variable to track number of requests received.

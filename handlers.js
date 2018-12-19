@@ -7,7 +7,7 @@
 */
 
 // Dependencies
-const { createToken, verify } = require('./auth');
+const { createToken, verify } = require('./token');
 
 const handler = {};
 
