@@ -20,14 +20,19 @@ const user = {
 	email: 'brad@gmail.com'
 }
 
+// Variables used for signing/verifying tokens
+const expiresAfter = '100s';
+const signageKey = 'secret';
+
+// Simplified console.log method
 const log = (dat) => console.log(dat);
 
 module.exports.createToken = (ctx) => {
 	// Do the db shit then get back the user to create token. To refactor the create token code too.
 	return new Promise((resolve, reject) => {
-		jwt.sign({ user }, 'secretkey', { expiresIn: '100s' }, (err, token) => {
+		jwt.sign(user, signageKey, { expiresIn: expiresAfter }, (err, token) => {
 			if (err)
-				reject(err);
+				reject(err); // Reject as it is internal error.
 
 			// Write token into a cookie for finalHandler to send back to client
 			// How do I erase the previously issused cookie stored on the client?
@@ -37,27 +42,36 @@ module.exports.createToken = (ctx) => {
 	});
 }
 
+/*
+Verify is to verify the token and send back the decrypted token
+
+The callback is called with the decoded payload if the signature is valid and optional
+expiration, audience, or issuer are valid. If not, it will be called with the error.
+*/
 module.exports.verify = (ctx) => {
 	getToken(ctx); // Sync call to get the token out of headers
 	return new Promise((resolve, reject) => {
-		jwt.verify(ctx.token, 'secretkey', (err, authData) => {
+
+		// Pass in the JWT from the user, the key used to sign the tokens and a callback function
+		jwt.verify(ctx.token, signageKey, (err, authData) => {
 			if (err) {
 				ctx.statusCode = 403; // Forbidden
 				ctx.res_body.error = 'Forbidden, invalid auth';
 				// reject(err); // Don't reject as it is not a code/logic error, but a user error
-				resolve(ctx);
 			}
 			else {
+				// After reading/decrypting the token
+				// Send the token back to function caller
+
 				// Send back the details the client requested for
-				ctx.res_body.message = 'Post created...';
+				ctx.res_body.message = 'Successfully verified';
 				ctx.res_body.authData = authData; // Probs not going to send this back to the user
-				resolve(ctx);
 			}
+			resolve(ctx); // Resolve with ctx regardless of errors or success.
 		});
 
 	})
 }
-
 
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
