@@ -18,6 +18,10 @@ try {
 	log('crypto support is disabled!');
 }
 
+// See how to improve this hash, as the .update is @deprecated
+// See if can use BCrypt? See what are the differences.
+let hash = (passwd) => crypto.createHmac('sha256', config.hashingSecret).update(passwd).digest('hex');
+
 // Authenticate username + password only. Does not deal with tokens here
 const authenticate = (user) => {
 	// 1) Should return a true or false indicating success or failure of Auth OR,
@@ -35,5 +39,8 @@ const authenticate = (user) => {
 			call the next 'middleware'
 		*/
 
+
+		if (hash(password) !== passwd_in_DB)
+			callBack(403, 'Forbidden, invalid login credentials.');
 	});
 };
