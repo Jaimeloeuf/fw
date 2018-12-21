@@ -1,12 +1,17 @@
+# File description
+This file contain all the information needed for a front-end dev to develop the WebApp based
+on the behaviour exposed via the APIs as stated below.
+
 # API routes:
 Where variables in <> angled brackets. E.g.
 <int: userID>
 meaning the variable will be a user ID with a type of 'integer'
 
+
+## Login and Logout
 ```url
 /login // Shows the login page.
 ```
-
 
 
 ```url
@@ -16,36 +21,7 @@ meaning the variable will be a user ID with a type of 'integer'
 
 
 
-
-# Users API	(Users as in people who want to book services)
-Users should be able to
-1.	Have a home page that tells them all about their bookings and services that they book to. Like all
-	the general informations.
-
-2.	Users should be able to book new sessions for a specific service.
-
-3.	Users should be able to update or delete a session for a specific service
-
-Each bookingID is uniquely tied to a particular booking 'object' in the DB,
-In the object, the data contained will be,
-- UserID
-- serviceID
-- sessionID
-- session details object
-	- time
-	- location
-	- addtional information array.
-- Status: which can be
-	- Pending
-	- Completed
-	- Cancelled
-- 
-
-From the service ID, you can see who owns/created the service.
-The current avail sessions of that service.
-
-
-
+## Users API	(Users as in people who want to book services)
 ```url
 /user/<hex: userID>
 /user/<hex: userID>/create	// only for admin accounts
@@ -67,7 +43,7 @@ The current avail sessions of that service.
 ```
 
 
-# Service Provider APIs	(People who owns and creates services)
+## Service Provider APIs	(People who owns and creates services)
 ```url
 /user/<hex: userID>
 /user/<hex: userID>/create	// only for admin accounts
