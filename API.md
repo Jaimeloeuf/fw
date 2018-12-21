@@ -25,7 +25,23 @@ meaning the variable will be a user ID with a type of 'integer'
 ```url
 /user/<hex: userID>
 /user/<hex: userID>/create	// only for admin accounts
-/user/<hex: userID>/book
+/user/<hex: userID>/book {
+	serviceID:
+	
+	time:
+	
+	session:
+
+	recurring: true
+	recurrence: {
+		daily: false,
+		weekly: false,
+		monthly: false,
+		yearly: false,
+		every: monday,
+		time: 7pm
+	}
+}
 
 /user/<hex: userID>/bookings	// Shows all current bookings
 /user/<hex: userID>/bookings/all	// Shows all bookings from the start
