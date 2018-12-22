@@ -20,7 +20,8 @@
 const { debug } = require('./utils');
 const { envName } = require('./config').env;
 
-finalHandler = (ctx) => {
+// const finalHandler = (ctx) => {
+function finalHandler(ctx) {
 	let { res_body } = ctx;
 	ctx.setContentLength(res_body = JSON.stringify(res_body));
 	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
@@ -28,14 +29,16 @@ finalHandler = (ctx) => {
 	return ctx; // To trigger the next .then method
 }
 
-function devMode(ctx) {
-	fh(ctx); // Call the res, finalHandler
+// Global variable to track number of completed requests.
+var reqCount = 0;
 
+function devMode(ctx) {
+	finalHandler(ctx); // Call the res, finalHandler
 	// Do all the logging and stuff here
-	console.timeEnd('Cycle time'); // Print time taken for each full req/res cycle
+	debug.logout_params(ctx); // Log out the ctx object for debugging
 	console.log(`Servicing req number: ${++reqCount}`); // Count the nummber of requests serviced
 	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
-	debug.logout_params(ctx); // Log out the ctx object for debugging
+	console.timeEnd('Cycle time'); // Print time taken for each full req/res cycle
 }
 
 /*	Auto choose a finalHandler based on current environment mode

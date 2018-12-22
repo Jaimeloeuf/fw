@@ -44,8 +44,6 @@ console.log(`Total memory for process: ${(require('v8').getHeapStatistics().tota
 	does not resolve back ctx.
 */
 
-var reqCount = 0; // Global variable to track number of requests received.
-
 // module.exports = (req, res) => {
 // 	// Create a new 'ctx' object with (req, res) objects
 // 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?

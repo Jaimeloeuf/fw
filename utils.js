@@ -3,16 +3,16 @@
 // Modifications to the utils base on current process's env
 const { envName } = require('./config').env;
 // Check if current 'env' is 'production'
-if (envName === 'production') {
-	// Disable console logging and prevent use of debug object's console logging functions.
-	// Modifying the error logger in debug object to log, but not to the console.
-	console.log = () => {};
-	debug.console_lines = () => {};
-	debug.logout_params = () => {};
-	debug.error = (err) => {
-		// @TODO Write to error log file and send to error loggin microservice node instead
-	};
-}
+// if (envName === 'production') {
+// 	// Disable console logging and prevent use of debug object's console logging functions.
+// 	// Modifying the error logger in debug object to log, but not to the console.
+// 	console.log = () => { };
+// 	debug.console_lines = () => { };
+// 	debug.logout_params = () => { };
+// 	debug.error = (err) => {
+// 		// @TODO Write to error log file and send to error loggin microservice node instead
+// 	};
+// }
 
 // Version 1 of write, assumes that it must be a string an no error is made during usage
 const write = (str) => process.stdout.write(str);
@@ -48,13 +48,14 @@ const debug = {
 		// Print out 'n' number of dashes on the console, used to seperate stuff
 		while (--n) // A reverse while loop, more efficient than the old for loop
 			write('-');
+		write('\n');
 	},
 
 	logout_params(ctx) {
 		// Debug middleware to log out details from ctx object
 		debug.console_lines(90);
 		// Items from Req obj
-		log(`\nRequested path: '${ctx.path}'`);
+		log(`Requested path: '${ctx.path}'`);
 		log(`Request method: '${ctx.method}'`);
 		log('Queries received in url = ', ctx.query);
 		log('Headers received = ', ctx.headers);
@@ -62,19 +63,33 @@ const debug = {
 			log('Request Body: ', ctx.req_body);
 		debug.console_lines(60);
 		// Items from Res obj
-		log(`\nResponse status code: ${ctx.statusCode}`);
+		log(`Response status code: ${ctx.statusCode}`);
 		log('Response Headers are = ', ctx.res_headers);
 		log('Response Body: ', ctx.res_body);
+		debug.console_lines(60);
 		// Log Error if any
-		if (ctx.error.length) {
-			debug.console_lines(60);
-			log('\nErrors in error array for current ctx:\n', ctx.error);
-		}
+		if (ctx.error.length)
+			log('Errors in error array for current ctx:\n', ctx.error);
 	},
 	error: (err) => log(err)
 };
 
+// Parse a JSON string to an object in all cases, without throwing
+const parseJSON = (str) => {
+	try { return JSON.parse(str); }
+	catch (e) { return {}; } // Should I return false here instead
+};
+
+const parseJSON2 = (str) => {
+	return new Promise((resolve, reject) => {
+		try { resolve(JSON.parse(str)); }
+		catch (err) { reject(err); } // Should I return false here instead
+	})
+};
+
+
 module.exports = {
 	log: log,
-	debug: debug
+	debug: debug,
+	parseJSON: parseJSON
 };
