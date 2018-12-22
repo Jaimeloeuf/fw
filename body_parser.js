@@ -14,6 +14,15 @@ module.exports = (ctx) => {
 			if (ctx.checkContentType('application/json')) {
 				try { ctx.req_body = JSON.parse(ctx.req_body); }
 				catch (error) { return reject(error); }
+				// ^Why do I need to return a reject here? Oh ya, return stops it from continuing? THast so stupid
+				
+				// parseJSON(ctx.req_body)
+				// 	.then((data) => ctx.req_body = data)
+				// 	.catch((err) => reject(err))
+
+				// ctx.req_body = await parseJSON.catch((err) => reject(err));
+
+				// Use the generator waterfall thing?
 			}
 			else if (ctx.checkContentType('application/x-www-form-urlencoded'))
 				ctx.req_body = urlencodedParser(ctx.req_body); // Does this need try/catch too? Might throw error?

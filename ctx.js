@@ -52,7 +52,7 @@ module.exports.getCTX = (req, res) => {
 		// Get the query string as an object
 		query: parsedUrl.query,
 		// Get the cookies in the headers
-		cookies: getCookies(req.headers['cookie']),
+		// cookies: getCookies(req.headers['cookie']),
 		// @TODO implement a method to deal with the cookies above.
 		auth: req.headers['authorization'],
 		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
@@ -88,7 +88,7 @@ function getCookies(cookie) {
 	for (let i = 0; i < cookie.length; i += 2) {
 		let val = cookie[i + 1].split(';');
 		cookies[cookie[i]] = {
-			val = val[0],
+			val: val[0],
 			secure: false,
 			httponly: false,
 			exp: 100000000
