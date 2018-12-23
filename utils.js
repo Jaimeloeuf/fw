@@ -90,21 +90,26 @@ const parseJSON2 = (str) => {
 	})
 };
 
-function log_error(data) {
-	// Log Server type, 500 internal, error data to a log/error file
+function log_error(data) { // Returns a true to indicate success, else undefined if failed
+	// Log error that is of Server type, like a file cannot read due to permissions error, to a log/error file
 	let file = '../../logs/' + ((data.type.toLowerCase() === 'error') ? 'error.json' : 'activity.json');
-	let write_data = (typeof data === 'string') ? data : JSON.stringify(data, null, 4);
+	let data = (typeof data === 'string') ? data : JSON.stringify(data, null, 4);
 
 	// let timeStamp = new Date().toISOString(); // Add a timestamp
+	appendFile(file, data)
+		.then(() => true)
+		.catch((err) => log(err));
+}
 
-	fs.appendFile(file, write_data, 'utf8', function (error) {
+function appendFile(file, data) {
+	return new Promise((resolve, reject) => {
 		// Try to optimize append file code, check if it puts the whole file into memory
 		// before writing to it. Perhaps use a global fileScoped writeStream instead?
-		if (error) {
-			write('error with logger appending file\n');
-			if (error.code === 'ENOENT')
-				write('File does not exist\n');
-		}
+		fs.appendFile(file, data, 'utf8', (err) => {
+			if (err)
+				return reject(err)
+			return resolve();
+		});
 	});
 }
 
