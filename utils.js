@@ -1,5 +1,8 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
+// Dependencies
+const fs = require('fs'); // Module used to access file system
+
 // Modifications to the utils base on current process's env
 const { envName } = require('./config').env;
 // Check if current 'env' is 'production'
@@ -87,9 +90,28 @@ const parseJSON2 = (str) => {
 	})
 };
 
+function log_error(data) {
+	// Log Server type, 500 internal, error data to a log/error file
+	let file = '../../logs/' + ((data.type.toLowerCase() === 'error') ? 'error.json' : 'activity.json');
+	let write_data = (typeof data === 'string') ? data : JSON.stringify(data, null, 4);
+
+	// let timeStamp = new Date().toISOString(); // Add a timestamp
+
+	fs.appendFile(file, write_data, 'utf8', function (error) {
+		// Try to optimize append file code, check if it puts the whole file into memory
+		// before writing to it. Perhaps use a global fileScoped writeStream instead?
+		if (error) {
+			write('error with logger appending file\n');
+			if (error.code === 'ENOENT')
+				write('File does not exist\n');
+		}
+	});
+}
+
 
 module.exports = {
 	log: log,
 	debug: debug,
-	parseJSON: parseJSON
+	parseJSON: parseJSON,
+	log_error: log_error
 };
