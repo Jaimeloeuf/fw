@@ -6,10 +6,6 @@ const getPayload = require('./req_payload');
 const bodyParser = require('./body_parser');
 const router = require('./router');
 const finalHandler = require('./finalHandler');
-// const { debug } = require('./utils');
-
-// Convert avail memory from bytyes to MB and round to 2 d.p.
-console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
 
 /* 	@Doc Flow of logic:
 	0. Parse req object with getCTX()
@@ -24,6 +20,7 @@ console.log(`Total memory for process: ${(require('v8').getHeapStatistics().tota
 	@Note_to_self: Does the above somehow mean concurreny and parrallelism? See more on this.
 
 	@Notes / @Doc
+	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.
 	In promise land when 1 promise rejects, all the '.then' calls are
 	skipped and the trailing '.catch' method is called instead.
 	The .catch method will set the error received into the ctx object which is scoped to the
@@ -36,42 +33,19 @@ console.log(`Total memory for process: ${(require('v8').getHeapStatistics().tota
 	Add some features for finalHandler to deal with the error(s) in 'ctx' object
 	See if it is feasible to make the unifiedServer function into an async function, using async/await
 
-	Exported function is the unifiedServer used to handle requests from both HTTP and HTTPS server.
-
 	To update this module to fix the Promise waterfall. Make it so that 'finally' is where I handle both
-	responses to client, and errors that should be sent back to the client.
-	I can totally use async/await on getCTX, so that I can do the chaining thing better as .catch method
-	does not resolve back ctx.
+	responses to client, and client errors such as 404 should be sent back to the client.
+	I should use async/await on getCTX, so that I can do the chaining thing better as .catch
+	method does not resolve back ctx.
 */
 
-// module.exports = (req, res) => {
-// 	// Create a new 'ctx' object with (req, res) objects
-// 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
-// 	console.time('Cycle time'); // For dev-env only
-// 	// let time = process.hrtime();
-// 	const ctx = getCTX(req, res);
-
-// 	// Promise Chaining to respond back to client
-// 	getPayload(ctx)
-// 		.then((ctx) => bodyParser(ctx))
-// 		.then((ctx) => router(ctx)(ctx))
-// 		.then((ctx) => finalHandler(ctx))
-// 		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
-// 		.finally(() => {
-// 			debug.logout_params(ctx);
-// 			// For dev-env only
-// 			console.timeEnd('Cycle time');
-// 			console.log(`Servicing req number: ${++reqCount}`);
-// 			console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
-// 		})
-// 		.catch((err) => console.error(err));
-// }
-
+// Convert avail memory from bytyes to MB and round to 2 d.p.
+console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
 
 module.exports = (req, res) => {
 	// Create a new 'ctx' object with (req, res) objects
 	console.time('Cycle time'); // For dev-env only
-	const ctx = getCTX(req, res);
+	const ctx = getCTX(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 
 	// Promise Chaining to respond back to client
 	getPayload(ctx)
@@ -79,5 +53,5 @@ module.exports = (req, res) => {
 		.then((ctx) => router(ctx)(ctx))
 		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
 		.finally(() => finalHandler(ctx))
-		.catch((err) => console.error(err));
+		.catch((err) => console.error(err)); // @TODO change this to use the universal logging and error collection method
 }
