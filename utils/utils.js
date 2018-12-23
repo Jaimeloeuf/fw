@@ -90,15 +90,16 @@ const parseJSON2 = (str) => {
 	})
 };
 
-function log_error(data) { // Returns a true to indicate success, else undefined if failed
+const error_log_file = './logs/error.json'; // This value should be read from the config file
+
+function log_error(data) {
 	// Log error that is of Server type, like a file cannot read due to permissions error, to a log/error file
-	let file = '../../logs/' + ((data.type.toLowerCase() === 'error') ? 'error.json' : 'activity.json');
-	let data = (typeof data === 'string') ? data : JSON.stringify(data, null, 4);
+	let data = JSON.stringify(data, null, 4); // Construct the data, the data should be an 'error' object, so Stringfy before write
 
 	// let timeStamp = new Date().toISOString(); // Add a timestamp
-	appendFile(file, data)
-		.then(() => true)
-		.catch((err) => log(err));
+	appendFile(error_log_file, data)
+		.then(() => true) // Returns a true to indicate log success, else undefined if failed
+		.catch((err) => log(err)); // Log the error to console if unable to append to error file.
 }
 
 function appendFile(file, data) {
