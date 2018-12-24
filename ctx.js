@@ -1,13 +1,5 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
-// Dependencies
-const url = require('url');
-
-/* Global var */
-/* Create once, store many times. Prevent variable creation every single time getCTX method is called
-Function can use this variable created at program startup by overwrite the value every single time */
-var parsedUrl;
-
 /* @Doc
 	Copying koa.js idea on using a ctx object
 	Where ctx is an object containing both the req and res objects and
@@ -22,6 +14,15 @@ var parsedUrl;
 	Learn how to use function prototypes like below:
 	getCTX.prototype.req = req;
 */
+
+// Dependencies
+const url = require('url');
+
+/*	Global var:
+	Create once, store many times. Prevent variable creation every single time getCTX method is called
+	Function can use this variable created at program startup by overwrite the value every single time */
+var parsedUrl;
+
 module.exports.getCTX = (req, res) => {
 	// Get URL and parse it, parse query strings if any in url
 	parsedUrl = url.parse(req.url, true);
@@ -65,7 +66,8 @@ module.exports.getCTX = (req, res) => {
 			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
 			'content-length': 0, // MUST be set by finalHandler else client will hang as it waits for the server
 		},
-		setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
+		// setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
+		setContentLength: (body) => this.res_headers['content-length'] = Buffer.byteLength(body), // Arrow func implementation of abv
 		res_body: {},
 
 		// @TODO to test and improve on the res_cookies below
@@ -79,6 +81,18 @@ module.exports.getCTX = (req, res) => {
 		// Method to push new error into the error array.
 		newError(err) { this.error.push(err); }
 	};
+}
+
+
+/* With this design, the code in the handler will execute finnish first before it enters finalHandler, and the finalHandler
+	will then deal with this redirect. */
+function redirect(url, redirect_type = 307) {
+	res.writeHead(redirect_type, { Location: url });
+	ctx.redirect_info = {
+		location: url,
+		redirect_type: 307
+	}
+	console.log(`Redirecting req to ${url}`); // logging activity
 }
 
 // Returns an object with all the cookies
