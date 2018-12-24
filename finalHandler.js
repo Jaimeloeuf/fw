@@ -17,12 +17,14 @@
 */
 
 // Dependencies
-const { debug } = require('./utils');
+const { debug } = require('./utils/utils');
 const { envName } = require('./config').env;
 
 // const finalHandler = (ctx) => {
 function finalHandler(ctx) {
 	let { res_body } = ctx;
+	if(ctx.error.length && ctx.statusCode < 400) // if there is errors inside ctx recorded during the cycle, and the status code is less than the range of error codes
+		ctx.statusCode = 500; // Default the status code to 500 server internal error.
 	ctx.setContentLength(res_body = JSON.stringify(res_body));
 	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
 	ctx.res.end(res_body);

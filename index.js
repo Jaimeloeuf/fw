@@ -4,7 +4,7 @@
 const http = require('http');
 const unifiedServer = require('./server');
 const { env } = require('./config');
-const { log } = require('./utils');
+const { log } = require('./utils/utils');
 
 /* @TODO
 	Should I replace all the process.exit() calls?
