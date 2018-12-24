@@ -1,5 +1,13 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
+/*	@Doc
+	This router module exports the router function
+	The router function takes in a ctx object, where it will,
+	1) Route it to the router that matches the request method
+	2) Returns a handler that is either associated with the given route,
+		or returns the 404 not found handler.
+*/
+
 // Dependencies
 const handler = require('./handlers');
 
@@ -37,7 +45,9 @@ module.exports = (ctx) => {
 	Check the router object/hashmap with the request route for a handler.
 	If none defined, use the notFound handler. */
 	if (router)
-		return router[ctx.path] ? router[ctx.path] : handler.notFound;
+		return router[ctx.path] || handler.notFound; // Using OR operator, not sure if this work, needs testing
+		// return router[ctx.path] ? router[ctx.path] : handler.notFound; // Using ternary operator
+
 	// If no such router for request method, use the invalidReqMethod handler to deal with the request.
 	return handler.invalidReqMethod;
 };

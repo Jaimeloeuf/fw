@@ -42,12 +42,13 @@ meaning the variable will be a user ID with a type of 'integer'
 	}
 }
 
-- /user/<hex: userID>/bookings	// Shows all current bookings
-- /user/<hex: userID>/bookings/all	// Shows all bookings from the start
-- GET /user/<hex: userID>/bookings/<hex: bookingID>/	// Display more detail for a particular booking
-- DEL /user/<hex: userID>/bookings/<hex: bookingID>/	// cancel or delete the booking
-- PUT /user/<hex: userID>/bookings/<hex: bookingID>/	// Update the booking
-- /user/<hex: userID>/bookings/<hex: bookingID>
+
+- /user/<hex: userID>/booking	// Shows all current booking
+- /user/<hex: userID>/booking/all	// Shows all booking from the start
+- GET /user/<hex: userID>/booking/<hex: bookingID>/	// Display more detail for a particular booking
+- DEL /user/<hex: userID>/booking/<hex: bookingID>/	// cancel or delete the booking
+- PUT /user/<hex: userID>/booking/<hex: bookingID>/	// Update the booking
+- /user/<hex: userID>/booking/<hex: bookingID>
 
 - /user/<hex: userID>/services // Services that the current user is subscribed to
 - /user/<hex: userID>/services/<hex: serviceID>	// Get details of the service with this service ID
@@ -67,15 +68,17 @@ against the one read from the JWT...
 
 DMS === Database management software
 
-### /user/<hex: userID>/bookings
+### /user/<hex: userID>/booking
 GET:
 Shows all current bookings of the user.
 What happens is that when the server receives this request, it looks into the database with that user ID after JWT verification and get a list of all the current bookings the user have.
 Should I ask the DMS to look through the tables and find the bookings that are still time valid and return the data, or should I ask the DMS to return me all the bookings of the user and filter out the current time valid ones in the node app?
 
 POST:
-
-
+in the message body: {
+	bookingID...
+}
+post a message body to receive a 
 
 
 
@@ -89,12 +92,12 @@ POST:
 - /user/<hex: userID>
 - /user/<hex: userID>/create	// only for admin accounts
 - 
-- /user/<hex: userID>/bookings	// Shows all current bookings
-- /user/<hex: userID>/bookings/all	// Shows all bookings from the start
-- /user/<hex: userID>/bookings/<hex: bookingID>	// Display more detail for a particular booking
-- /user/<hex: userID>/bookings/<hex: bookingID>/cancel
-- /user/<hex: userID>/bookings/<hex: bookingID>/update
-- /user/<hex: userID>/bookings/<hex: bookingID>
+- /user/<hex: userID>/booking	// Shows all current booking
+- /user/<hex: userID>/booking/all	// Shows all booking from the start
+- /user/<hex: userID>/booking/<hex: bookingID>	// Display more detail for a particular booking
+- /user/<hex: userID>/booking/<hex: bookingID>/cancel
+- /user/<hex: userID>/booking/<hex: bookingID>/update
+- /user/<hex: userID>/booking/<hex: bookingID>
 
 - /user/<hex: userID>/services
 
