@@ -18,10 +18,83 @@
 // Dependencies
 const url = require('url');
 
+// How to use the new class method.
+// const ctx = new CTX(req, res);
+
 /*	Global var:
 	Create once, store many times. Prevent variable creation every single time getCTX method is called
 	Function can use this variable created at program startup by overwrite the value every single time */
 var parsedUrl;
+
+class CTX {
+	constructor(req, res) {
+		this.req = req;
+		this.res = res;
+		this.continue = true;
+
+		parsedUrl = url.parse(req.url, true);
+		// Parsed url object
+		this.url = parsedUrl;
+		// Get the path. Remove / from the start and the end, but keep those in the middle.
+		this.path = parsedUrl.pathname.replace(/^\/+|\/+$/g, '');
+		// Get the request method, make all upper case for consistency
+		this.method = req.method.toUpperCase();
+		// Get headers as an object
+		this.headers = req.headers;
+
+		// Get the contentType of the incoming req payload, to be used for parsing the payload
+		this.contentType = req.headers["content-type"];
+		// Method to check if content-type of incoming req payload is equals to given type
+		this.checkContentType = (type) => type === req.headers["content-type"];
+		// Get the query string as an object
+		this.query = parsedUrl.query;
+		// Get the cookies in the headers
+		// cookies: getCookies(req.headers['cookie']),
+		// @TODO implement a method to deal with the cookies above.
+		this.auth = req.headers['authorization'];
+		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
+
+
+		// Setting Defaults for response object
+		this.res_headers = {
+			'content-type': 'application/json', // Default response of API server should be in JSON
+			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
+			'content-length': 0, // MUST be set by finalHandler else client will hang as it waits for the server
+		};
+		this.res_body = {};
+
+		// @TODO to test and improve on the res_cookies below
+		this.res_cookies = [];
+
+
+		// Any middleware can add its error output to this error object which will be logged tgt at the end.
+		this.error = [];
+		// Method to push new error into the error array.
+	}
+	statusCode = (code) => {
+		try {
+			Object.defineProperty(this, 'statusCode', {
+				// Set value and prevent this property from being modified again.
+				writable: false,
+				value: code
+			});
+
+		} catch (err) {
+			log(err, '\nError: Status code has already been set, cannot set it again.');
+		}
+	};
+
+	// Is the arrow function okay since I am using the this keyword??
+	setContentLength = (body) => this.res_headers['content-length'] = Buffer.byteLength(body); // Arrow func implementation of abv
+	newCookie = (cookie) => this.res_cookies.push(cookie);
+	newError = (err) => this.error.push(err);
+};
+
+// The default status code returned to the client
+Object.defineProperty(CTX.prototype, 'statusCode', { configurable: false, value: '200' });
+
+
+
 
 module.exports.getCTX = (req, res) => {
 	// Get URL and parse it, parse query strings if any in url
@@ -34,6 +107,7 @@ module.exports.getCTX = (req, res) => {
 	return {
 		req: req,
 		res: res,
+		continue: true, // Indicator if 
 
 		// Parsed url object
 		url: parsedUrl,
@@ -61,6 +135,15 @@ module.exports.getCTX = (req, res) => {
 
 		// Setting Defaults for response object
 		statusCode: 200,
+		statusCode_set = false,
+		// statusCode: (code) => {
+		// 	if (!statusCode_set) {
+		// 		this.statusCode = code
+		// 		this.statusCode_set = true;
+		// 	}
+		// 	else
+		// 		console.log('Error: Status code has already been set, cannot set it again.');
+		// },
 		res_headers: {
 			'content-type': 'application/json', // Default response of API server should be in JSON
 			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
@@ -68,6 +151,7 @@ module.exports.getCTX = (req, res) => {
 		},
 		// setContentLength: function (body) { return this.res_headers['content-length'] = Buffer.byteLength(body); },
 		setContentLength: (body) => this.res_headers['content-length'] = Buffer.byteLength(body), // Arrow func implementation of abv
+		// Is the arrow function okay since I am using the this keyword??
 		res_body: {},
 
 		// @TODO to test and improve on the res_cookies below
@@ -86,12 +170,9 @@ module.exports.getCTX = (req, res) => {
 
 /* With this design, the code in the handler will execute finnish first before it enters finalHandler, and the finalHandler
 	will then deal with this redirect. */
-function redirect(url, redirect_type = 307) {
-	res.writeHead(redirect_type, { Location: url });
-	ctx.redirect_info = {
-		location: url,
-		redirect_type: 307
-	}
+function redirect(url, redirect_type = 307, cont = true) {
+	ctx.res_headers.Location = url;
+	ctx.statusCode = redirect_type; // Smth to prevent this from being changed once set.
 	console.log(`Redirecting req to ${url}`); // logging activity
 }
 
