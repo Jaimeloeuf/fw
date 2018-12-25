@@ -15,6 +15,9 @@ but for now, I will stick with it and perhaps even introduce more dependencies i
 I will only be adding dependencies when I feel absolutely required/needed or just good to have in some places,
 such as JWT and perhaps to implement the BCrypt hash function.
 
+Currently in works of trying to make this into a JS Framework.
+The focus of this project/server/framework is optimization, performance and reduced dependencies.
+
 # To anyone who wants to use this for whatever reasons.
 I do not garuntee that this thing will work or whatsoever, this is meant as a learning experience for myself,
 so if you want to look at my code for reference or to learn I'm cool with that, but if you use it for
@@ -39,7 +42,23 @@ artillery run test.yml
 
 ##API and usage
 ```js
+// Get a reference to the framework via the fw module.
+const app = require('./fw');
 
+/*	This fw allows you to define a route and a handler for that route.
+	
+	You can create/define routes based on their expected request methods with the built in methods like
+	.get()  .post()  .put()  .del()
+
+	Notice that you do not need to call the next middleware/function in the cycle, as the fw takes care
+	of it in the server module of this framework. The methods exposed fw just adds that route that you
+	defined into the server's router and add the annonymous function as the handler for that route in
+	the same server.
+*/
+// Example ping route that sends back a 200 ok as long as server is up.
+app.get('/ping', (ctx) => {
+	ctx.setStatusCode(200); // Technically unnecessary as the status code defaults to 200 if not set.
+});
 ```
 
 ### Misc info

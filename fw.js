@@ -16,7 +16,12 @@ module.exports.del = (route, handler) => setHandler('DEL', route, handler);
 /*	fnModifier function  takes in a function and returns a function that has been modified to call
 	the original function and return the ctx object. By using this modifier, the route handlers
 	defined in the app module/file that uses this framework does not need to return 'ctx' everytime.
-	'ctx' needs to be returned no matter what to trigger the next .then method*/
+	'ctx' needs to be returned no matter what to trigger the next .then method
+	
+	This is great for normal sync and sequenced functions, but the problems lies with Promises.
+	Especially with the move towards the use of Async/Await in the server module, it expects a
+	Promise to be returned. Unlike the old way which will still work.
+*/
 
 const fnModifier = (fn) => (ctx) => { fn(ctx); return ctx; }; // Inlined shorthand function definition
 

@@ -4,6 +4,8 @@
 	This module contains all the defintions for generic handlers for the router to call, and it also imports
 	all the other handlers in their seperate modules like the 'auth' handler / module, in order to create the
 	handlers object and export all of it as one handler object to the router.
+
+	The functions/handlers defined in this file will be available to to anyone using this as a framework.
 */
 
 // Dependencies
@@ -18,7 +20,6 @@ handler.login = (ctx) => {
 handler.user = (ctx) => {
 	return verify(ctx);
 }
-
 
 // Login handler
 // handler.login = (ctx) => {

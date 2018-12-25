@@ -23,4 +23,4 @@ const app = require('./fw');
 app.get('/login', (ctx) => {
 	if (ctx.auth === 'passwd')
 		createToken(ctx.auth);
-})
+});
