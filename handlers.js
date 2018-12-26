@@ -40,7 +40,7 @@ handler.logout = (ctx) => {
 // Sample handler using 'ctx'
 handler.sample = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
-	ctx.statusCode = 201;
+	ctx.setStatusCode(201);
 	ctx.res_body = { 'handler name': 'sample handler' };
 	return ctx; // To trigger the next .then method
 };
@@ -50,7 +50,7 @@ handler.sample = (ctx) => {
 handler.sample2 = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
 	return new Promise((resolve, reject) => {
-		ctx.statusCode = 201;
+		ctx.setStatusCode(201);
 		ctx.res_body = { 'handler name': 'sample handler' };
 
 		// Call to DB...... need to wait
@@ -64,19 +64,19 @@ handler.sample2 = (ctx) => {
 // Ping handler to see if server is up
 handler.ping = (ctx) => {
 	// Actually the statusCode does need to be set, as 200 is the default value
-	ctx.statusCode = 200; // Send back a HTTP code to indicate server is up
+	ctx.setStatusCode(201); // Send back a HTTP code to indicate server is up
 	return ctx; // To trigger the next .then method
 };
 
 // Not found handler
 handler.notFound = (ctx) => {
-	ctx.statusCode = 404; // Send back the HTTP code to indicate route not defined
+	ctx.setStatusCode(404); // Send back the HTTP code to indicate route not defined
 	return ctx; // To trigger the next .then method
 };
 
 // Invalid request Method handler
 handler.invalidReqMethod = (ctx) => {
-	ctx.statusCode = 501; // Send back the HTTP code to indicate request method not accepted
+	ctx.setStatusCode(501); // Send back the HTTP code to indicate request method not accepted
 	return ctx; // To trigger the next .then method
 };
 

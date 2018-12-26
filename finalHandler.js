@@ -24,7 +24,7 @@ const { envName } = require('./config').env;
 function finalHandler(ctx) {
 	let { res_body } = ctx;
 	if(ctx.error.length && ctx.statusCode < 400) // if there is errors inside ctx recorded during the cycle, and the status code is less than the range of error codes
-		ctx.statusCode = 500; // Default the status code to 500 server internal error.
+		ctx.setStatusCode(500); // Default the status code to 500 server internal error.
 	ctx.setContentLength(res_body = JSON.stringify(res_body));
 	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
 	ctx.res.end(res_body);
@@ -40,7 +40,7 @@ function devMode(ctx) {
 	debug.logout_params(ctx); // Log out the ctx object for debugging
 	console.log(`Servicing req number: ${++reqCount}`); // Count the nummber of requests serviced
 	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
-	console.timeEnd('Cycle time'); // Print time taken for each full req/res cycle
+	console.timeEnd('Cycle time'); // Time taken for full req/res cycle including time for logging/debugging above
 }
 
 /*	Auto choose a finalHandler based on current environment mode

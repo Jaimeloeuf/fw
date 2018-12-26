@@ -21,7 +21,7 @@ module.exports = {
 
 	logout_params(ctx) {
 		// Debug middleware to log out details from ctx object
-		debug.console_lines(90);
+		this.console_lines(90);
 		// Items from Req obj
 		log(`Requested path: '${ctx.path}'`);
 		log(`Request method: '${ctx.method}'`);
@@ -29,14 +29,14 @@ module.exports = {
 		log('Headers received = ', ctx.headers);
 		if (ctx.req_body)	// Log req_body if any
 			log('Request Body: ', ctx.req_body);
-		debug.console_lines(60);
+		this.console_lines(60);
 		// Items from Res obj
 		log(`Response status code: ${ctx.statusCode}`);
 		log('Response Headers are = ', ctx.res_headers);
 		log('Response Body: ', ctx.res_body);
-		debug.console_lines(60);
+		this.console_lines(60);
 		// Log Error if any
 		if (ctx.error.length)
-			log('Errors in error array for current ctx:\n', ctx.error);
+			log(`${ctx.error.length} Errors in error array for current ctx:\n`, ctx.error);
 	}
 };
