@@ -26,8 +26,9 @@ class Ctx {
 		this.method = req.method.toUpperCase();
 		// Get headers as an object
 		this.headers = req.headers;
+		this.userAgent = this.headers['user-agent'];
 		// Get the contentType of the incoming req payload, to be used for parsing the payload
-		this.contentType = req.headers["content-type"];
+		this.contentType = this.headers["content-type"];
 		// Method for comparing a given content type with the content type of the request object.
 		this.checkContentType = (type) => type === this.contentType;
 		// Get the query string as an object
@@ -35,7 +36,7 @@ class Ctx {
 		// Get the cookies in the headers
 		// cookies: getCookies(req.headers['cookie']),
 		// @TODO implement a method to deal with the cookies above.
-		this.auth = req.headers['authorization'];
+		this.auth = this.headers['authorization'];
 		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
 
 		/* All things from the req object should be frozen after having their values set unlike the response objects */
@@ -43,6 +44,7 @@ class Ctx {
 		/* Setting Defaults for response object */
 		// Default must haves for the response headers, add more by defining new Key/Value pairs
 		this.res_headers = {
+			// Should I change this into a function that calls res.setHeader method? So that node caches the header internally for me instead of me keeping a record in the 'ctx' object
 			'content-type': 'application/json', // Default response of API server should be in JSON
 			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
 			'content-length': 0, // MUST be set by finalHandler else client will hang as it waits for the server
