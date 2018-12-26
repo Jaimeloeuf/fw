@@ -62,10 +62,23 @@ handler.sample2 = (ctx) => {
 };
 
 // Ping handler to see if server is up
+// Actually dont need to do anything here as status code 200 is the default value
 handler.ping = (ctx) => {
 	// Actually the statusCode does need to be set, as 200 is the default value
-	ctx.setStatusCode(201); // Send back a HTTP code to indicate server is up
+	ctx.setStatusCode(200); // Send back a HTTP code to indicate server is up
 	return ctx; // To trigger the next .then method
+};
+
+// Handler that will test the server's functionality when called and return a diagnostic report when done.
+handler.test = (ctx) => {
+	// Admin privilleges / permissions are needed to use this handler
+	// Verify identity with JWT or Auth method? It will depend on whether this server is a service or identity provider.
+	// If identity provider that provides JWT, then user needs to get the JWT first and then call this route
+
+	// Include the currnt config of the environment as part of the diagnostics
+	ctx.res_body.env = env;
+
+	// Test all the db connection for this specific service/server
 };
 
 // Not found handler

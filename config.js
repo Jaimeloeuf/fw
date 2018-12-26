@@ -28,3 +28,9 @@ current_env.port = process.env.HTTP_PORT || current_env.port;
 current_env.user = process.env.user; // See how to do this, esp for linux systems
 
 module.exports.env = current_env;
+
+module.exports.jwt = {
+	aud: undefined,
+	iss: undefined,
+	// More fields such as the Public key for decrypting JWE and stuff
+};

@@ -42,34 +42,39 @@ const finalHandler = require('./finalHandler');
 // Convert avail memory from bytyes to MB and round to 2 d.p.
 console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
 
-module.exports = (req, res) => {
-	// Create a new 'ctx' object with (req, res) objects
-	console.time('Cycle time'); // For dev-env only
-	const ctx = new Ctx(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
-
-	// Promise Chaining to respond back to client
-	getPayload(ctx)
-		.then((ctx) => bodyParser(ctx))
-		.then((ctx) => router(ctx)(ctx))
-		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
-		.finally(() => finalHandler(ctx))
-		.catch((err) => console.error(err)); // @TODO change this to use the universal logging and error collection method
-}
-
-// module.exports = async (req, res) => {
+// module.exports = (req, res) => {
 // 	// Create a new 'ctx' object with (req, res) objects
 // 	console.time('Cycle time'); // For dev-env only
-// 	const ctx = getCTX(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+// 	const ctx = new Ctx(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 
-// 	try {
-// 		await getPayload(ctx);
-// 		await bodyParser(ctx);
-// 		await router(ctx)(ctx); // Get a route Handler from the router and call the handler
-
-// 	} catch (err) {
-// 		ctx.newError(err); // perhaps set the status code to 500?
-// 	}
-// 	finalHandler(ctx)
-// 		.catch((err) => console.error(err));
-// 		// @TODO change above to use the universal logging and error collection method
+// 	// Promise Chaining to respond back to client
+// 	getPayload(ctx)
+// 		.then((ctx) => bodyParser(ctx))
+// 		.then((ctx) => router(ctx)(ctx))
+// 		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
+// 		.finally(() => finalHandler(ctx))
+// 		.catch((err) => console.error(err)); // @TODO change this to use the universal logging and error collection method
 // }
+
+// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+
+module.exports = async (req, res) => {
+	// Create a new 'ctx' object with (req, res) objects
+	console.time('Cycle time'); // For dev-env only
+	const ctx = new Ctx(req, res);
+
+	try {
+		await getPayload(ctx);
+		await bodyParser(ctx);
+		await router(ctx)(ctx); // Get a route Handler from the router and call the handler
+	} catch (err) {
+		ctx.newError(err);
+	}
+
+	try {
+		await finalHandler(ctx);	
+	} catch (err) {
+		console.error(err);
+	}
+	// @TODO change above to use the universal logging and error collection method
+}

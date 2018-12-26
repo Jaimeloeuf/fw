@@ -65,3 +65,11 @@ app.get('/ping', (ctx) => {
 To Change memory limit/use of the node process, use the below code and change 1024 to desired memory size in MB
 ```bash
 node --max-old-space-size=1024 .\index.js
+```
+
+### Resources available from the Framework / Things that are user modifiable
+The user of this framework will have access to the:
+1.	methods exposed by the fw module and all the methods provided in the 'ctx' object that will be passed in to the route handlers.
+2.	The db schema file to define your own db / settings / schema and more
+3.	user Config file that will be read in by the config module.
+	In this file you can choose to disable default route handlers like ping.
