@@ -7,15 +7,18 @@
 // Dependencies
 const fs = require('fs'); // Module used to access file system
 
+
 // Just a simple shorthand / abbrev. for process write method
-// To see which is the better one? To allow other functions in the same file scope to access.
-module.exports.write = (str) => process.stdout.write(str);
-module.exports.write = function write(str) { process.stdout.write(str); }
+const write = (str) => process.stdout.write(str);
 
 
 var len; // File scoped variable to use in the log function for optimization, create once, use many times
-module.exports.log = () => {
-	// There is no named input parameters for this function, as it can take in a variadic amount of print arguemnts
+function log() {
+	/*	@Doc
+		There is no named input parameters for this function, as it can take in a variadic amount of print arguemnts
+		Cannot use arrow function, because the arguements object used inside the function needs to bind to the this
+		functional scope instead of the module's wrapping function.
+	*/
 	len = arguments.length;
 
 	// If boolean value is found at the end, use it as condition for newline
@@ -38,9 +41,9 @@ module.exports.log = () => {
 
 const error_log_file = './logs/error.json'; // This value should be read from the config file
 // @TODO Write to error log file and send to error logging microservice node instead
-module.exports.log_error = (data) => {
+function log_error(data) {
 	// Log error that is of Server type, like a file cannot read due to permissions error, to a log/error file
-	let data = JSON.stringify(data, null, 4); // Construct the data, the data should be an 'error' object, so Stringfy before write
+	data = JSON.stringify(data, null, 4); // Construct the data, the data should be an 'error' object, so Stringfy before write
 
 	// let timeStamp = new Date().toISOString(); // Add a timestamp
 	appendFile(error_log_file, data)
@@ -58,4 +61,10 @@ function appendFile(file, data) {
 			return resolve();
 		});
 	});
+}
+
+module.exports = {
+	write: write,
+	log: log,
+	log_error: log_error
 }

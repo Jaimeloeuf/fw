@@ -5,7 +5,7 @@
 */
 
 // Dependencies
-const log = require('./log');
+const { log, write } = require('./log');
 
 // const { envName } = require('./config').env;
 // if current 'env' is 'production' Allow debug object to still be used, but to log to a error logging service instead?

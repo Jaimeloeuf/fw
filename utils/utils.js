@@ -6,16 +6,8 @@
 */
 
 // Dependencies
-const loggers = require('./log');
-
-module.exports = {
-	write: loggers.write,
-	log: loggers.log,
-	log_error: loggers.log_error,
-	debug: require('./debug'),
-	parseJSON: parseJSON,
-};
-
+// const loggers = require('./log');
+const { log, write, log_error } = require('./log');
 
 /* To test if below parseJSON methods work before refactoring out to their own modules. */
 // Parse a JSON string to an object in all cases, without throwing
@@ -29,4 +21,12 @@ const parseJSON2 = (str) => {
 		try { resolve(JSON.parse(str)); }
 		catch (err) { reject(err); } // Should I return false here instead
 	})
+};
+
+module.exports = {
+	write: write,
+	log: log,
+	log_error: log_error,
+	debug: require('./debug'),
+	parseJSON: parseJSON
 };
