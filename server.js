@@ -1,7 +1,7 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
 // Dependencies
-const CTX = require('./ctx');
+const Ctx = require('./ctx');
 const getPayload = require('./req_payload');
 const bodyParser = require('./body_parser');
 const router = require('./router');
@@ -45,7 +45,7 @@ console.log(`Total memory for process: ${(require('v8').getHeapStatistics().tota
 module.exports = (req, res) => {
 	// Create a new 'ctx' object with (req, res) objects
 	console.time('Cycle time'); // For dev-env only
-	const ctx = new CTX(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+	const ctx = new Ctx(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 
 	// Promise Chaining to respond back to client
 	getPayload(ctx)

@@ -22,11 +22,13 @@ const { envName } = require('./config').env;
 
 // const finalHandler = (ctx) => {
 function finalHandler(ctx) {
+	// Extract the response body out from the 'ctx' object
 	let { res_body } = ctx;
-	if(ctx.error.length && ctx.statusCode < 400) // if there is errors inside ctx recorded during the cycle, and the status code is less than the range of error codes
-		ctx.setStatusCode(500); // Default the status code to 500 server internal error.
+	// Stringfy response body and use setContentLength method to set content length of body in the headers.
 	ctx.setContentLength(res_body = JSON.stringify(res_body));
-	ctx.res.writeHead(ctx.statusCode, ctx.res_headers);
+	// If there are errors and status code less than the error codes, respond with a 500 internal error code.
+	ctx.res.writeHead((ctx.error.length && ctx.statusCode < 400) ? 500: ctx.statusCode, ctx.res_headers);
+	// Send the message body back to the client and end the connection
 	ctx.res.end(res_body);
 	return ctx; // To trigger the next .then method
 }
