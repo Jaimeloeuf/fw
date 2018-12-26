@@ -80,4 +80,12 @@ handler.invalidReqMethod = (ctx) => {
 	return ctx; // To trigger the next .then method
 };
 
+handler.forbidden = (ctx) => {
+	// User has authenticated, but does not have permission for the route requested.
+	// E.g. A user using client crendentials to request for a admin page.
+
+	ctx.setStatusCode(403);
+	return ctx; // To trigger the next .then method
+}
+
 module.exports = handler;

@@ -53,11 +53,15 @@ module.exports.verify = (ctx) => {
 	return new Promise((resolve, reject) => {
 
 		// Pass in the JWT from the user, the key used to sign the tokens and a callback function
-		jwt.verify(ctx.token, signageKey, (err, authData) => {
+		jwt.verify(ctx.token, signageKey, (err, decoded_token) => {
 			if (err) {
-				ctx.statusCode = 403; // Forbidden
-				ctx.res_body.error = 'Forbidden, invalid auth';
-				// reject(err); // Don't reject as it is not a code/logic error, but a user error
+				ctx.statusCode = 401; // Forbidden
+				ctx.newError('Forbidden, invalid auth');
+
+				// if (err === 'invalid audience') // Only true if you add a audience field in the options object
+					// ctx.setStatusCode(40??)
+
+				// Error will not be rejected as it is not a code/server/logic error, but a client side error
 			}
 			else {
 				// After reading/decrypting the token
@@ -65,7 +69,7 @@ module.exports.verify = (ctx) => {
 
 				// Send back the details the client requested for
 				ctx.res_body.message = 'Successfully verified';
-				ctx.res_body.authData = authData; // Probs not going to send this back to the user
+				ctx.res_body.authData = decoded_token; // Probs not going to send this back to the user
 			}
 			resolve(ctx); // Resolve with ctx regardless of errors or success.
 		});
@@ -78,8 +82,9 @@ module.exports.verify = (ctx) => {
 function getToken(ctx) {
 	ctx.token = ctx.headers['authorization'].split(' ')[1]; // Split at the space and Get token from array
 	if (typeof ctx.token === 'undefined') // Check if bearer is undefined
-		ctx.statusCode = 403; // Forbidden
-	
+		ctx.statusCode = 401; // If token does not exist or not sent over, respond with a 401 auth-token not provided
+
+
 	// if (ctx.token === undefined) // Check if bearer is undefined
 	// 	ctx.statusCode = 403; // Forbidden
 }
