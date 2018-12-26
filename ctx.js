@@ -21,38 +21,34 @@ const url = require('url');
 // How to use the new class method.
 // const ctx = new CTX(req, res);
 
-/*	Global var:
-	Create once, store many times. Prevent variable creation every single time getCTX method is called
-	Function can use this variable created at program startup by overwrite the value every single time */
-var parsedUrl;
-
 class CTX {
 	constructor(req, res) {
 		this.req = req;
 		this.res = res;
 		this.continue = true;
 
-		parsedUrl = url.parse(req.url, true);
 		// Parsed url object
-		this.url = parsedUrl;
+		this.url = url.parse(req.url, true); // To freeze
 		// Get the path. Remove / from the start and the end, but keep those in the middle.
-		this.path = parsedUrl.pathname.replace(/^\/+|\/+$/g, '');
+		this.path = this.url.pathname.replace(/^\/+|\/+$/g, ''); // To freeze
 		// Get the request method, make all upper case for consistency
-		this.method = req.method.toUpperCase();
+		this.method = req.method.toUpperCase(); // To freeze
 		// Get headers as an object
-		this.headers = req.headers;
+		this.headers = req.headers; // To freeze
 
 		// Get the contentType of the incoming req payload, to be used for parsing the payload
-		this.contentType = req.headers["content-type"];
+		this.contentType = req.headers["content-type"]; // To freeze this.
 		// Method to check if content-type of incoming req payload is equals to given type
-		this.checkContentType = (type) => type === req.headers["content-type"];
 		// Get the query string as an object
-		this.query = parsedUrl.query;
+		this.query = parsedUrl.query; // To freeze
 		// Get the cookies in the headers
 		// cookies: getCookies(req.headers['cookie']),
 		// @TODO implement a method to deal with the cookies above.
-		this.auth = req.headers['authorization'];
+		this.auth = req.headers['authorization']; // To freeze
 		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
+
+
+		/* All things from the req object should be frozen unlike the response objects */
 
 
 		// Setting Defaults for response object
@@ -70,24 +66,27 @@ class CTX {
 		// Any middleware can add its error output to this error object which will be logged tgt at the end.
 		this.error = [];
 		// Method to push new error into the error array.
+		setStatusCode = (code) => {
+			try {
+				Object.defineProperty(this, 'statusCode', {
+					// Set value and prevent this property from being modified again.
+					writable: false,
+					value: code
+				});
+
+			} catch (err) {
+				log(err, '\nError: Status code has already been set, cannot set it again.');
+			}
+		};
+
+		checkContentType = (type) => type === this.contentType;
+		// Is the arrow function okay since I am using the this keyword??
+		setContentLength = (body) => this.res_headers['content-length'] = Buffer.byteLength(body); // Arrow func implementation of abv
+		newCookie = (cookie) => this.res_cookies.push(cookie);
+		newError = (err) => this.error.push(err);
 	}
-	statusCode = (code) => {
-		try {
-			Object.defineProperty(this, 'statusCode', {
-				// Set value and prevent this property from being modified again.
-				writable: false,
-				value: code
-			});
 
-		} catch (err) {
-			log(err, '\nError: Status code has already been set, cannot set it again.');
-		}
-	};
-
-	// Is the arrow function okay since I am using the this keyword??
-	setContentLength = (body) => this.res_headers['content-length'] = Buffer.byteLength(body); // Arrow func implementation of abv
-	newCookie = (cookie) => this.res_cookies.push(cookie);
-	newError = (err) => this.error.push(err);
+	// setStatusCode = (code) => {
 };
 
 // The default status code returned to the client
@@ -96,7 +95,12 @@ Object.defineProperty(CTX.prototype, 'statusCode', { configurable: false, value:
 
 
 
-module.exports.getCTX = (req, res) => {
+/*	Global var:
+	Create once, store many times. Prevent variable creation every single time getCTX method is called
+	Function can use this variable created at program startup by overwrite the value every single time */
+var parsedUrl;
+
+const getCTX = (req, res) => {
 	// Get URL and parse it, parse query strings if any in url
 	parsedUrl = url.parse(req.url, true);
 
@@ -107,7 +111,7 @@ module.exports.getCTX = (req, res) => {
 	return {
 		req: req,
 		res: res,
-		continue: true, // Indicator if 
+		continue: true, // Indicator if the functions shohuld continue execution. Certain functions like finalHandler can ignore this value.
 
 		// Parsed url object
 		url: parsedUrl,
@@ -134,16 +138,8 @@ module.exports.getCTX = (req, res) => {
 
 
 		// Setting Defaults for response object
-		statusCode: 200,
-		statusCode_set = false,
-		// statusCode: (code) => {
-		// 	if (!statusCode_set) {
-		// 		this.statusCode = code
-		// 		this.statusCode_set = true;
-		// 	}
-		// 	else
-		// 		console.log('Error: Status code has already been set, cannot set it again.');
-		// },
+		statusCode: 200, // Make this read only
+		setStatusCode: (code) => this.statusCode = code,
 		res_headers: {
 			'content-type': 'application/json', // Default response of API server should be in JSON
 			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
@@ -205,3 +201,9 @@ function getCookies(cookie) {
 		}
 	}
 }
+
+
+
+
+
+module.exports = CTX;
