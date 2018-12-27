@@ -19,38 +19,35 @@ const decoder = new (require('string_decoder').StringDecoder);
 // Perhaps allow this value to be read from the config module
 const max_size = 1e6; // 1e6 means 1MB
 
+var num = 0;
 // Module to handle incoming requests
 var buffer; // HEY WHAT??? WHy this here? How does it seperate for different requests???
-module.exports = (ctx) => {
-	// Call back function for new data chunk event emitted by the request object.
-	// const newDataCB = (data) => {
-	// 	buffer += decoder.write(data)
-	// 	if (buffer.length > max_size) {
-	// 		ctx.setStatusCode(413);
-	// 		console.log(`Length here: ${buffer.length}`)
-	// 		ctx.req.removeEventListener('data', newDataCB);
-	// 		return reject('Post entity too big');
-	// 		/*	Reject with error msg since the execution should not continue with this error
-	// 			Since the entity too big, I did not receive the full message, thus the request should not
-	// 			continue, and I should thus resolve, but set the 
-	// 			Reject and ask let finalHandler deal with the error n send back a 500	*/
-	// 	}
-	// }
-
-
-	return new Promise((resolve, reject) => {
+module.exports = (ctx) =>
+	new Promise((resolve, reject) => {
 		buffer = ''; // Reset/clear buffer
 		ctx.req
-			.on('error', (error) => reject(error)) // Reject with the error since this is a server error
-			// .on('data', newDataCB)
-			.on('data', function (data) {
-				buffer += decoder.write(data)
-				if (buffer.length > max_size) {
-					ctx.setStatusCode(413);
-					console.log(`Length here: ${buffer.length}`)
-					ctx.req.removeEventListener('data', this);
-					return reject('Post entity too big');
-					/*	Reject with error msg since the execution should not continue with this error
+			// .on('error', (error) => reject(error)) // Reject with the error since this is a server error
+			.on('error', (error) => {
+				console.log(buffer.length)
+				return reject(error)
+			}) // Reject with the error since this is a server error
+			.on('data', function newData(data) {
+				if (buffer.length < max_size)
+					buffer += decoder.write(data);
+				else {
+					console.log(`Length here: ${buffer.length}`);
+					console.log(`called in exceed size, ${++num}`)
+					ctx.req.pause();
+
+					ctx.setStatusCode(413); // Set HTTP status code for 'entity too large'
+					buffer = ''; // Clear/delete the received data in the buffer
+					ctx.req.emit('error', 'Post entity too big'); // Emit the error event
+
+					// Technically it is not a normal event but a stream instead
+					// ctx.req.destroy('Post entity too big'); // Destroy the readable stream
+
+					/*	return reject();
+						Reject with error msg since the execution should not continue with this error
 						Since the entity too big, I did not receive the full message, thus the request should not
 						continue, and I should thus resolve, but set the 
 						Reject and ask let finalHandler deal with the error n send back a 500	*/
@@ -69,8 +66,24 @@ module.exports = (ctx) => {
 		/*	Arrow functions are used here, because they will inherit the scope from its parent's functional block
 			Which will allow it to access 'buffer' directly? Not exactly clear on this yet.  */
 	});
-}
 
+
+// function newData(data) {
+// 				buffer += decoder.write(data)
+// 				console.log(`Length here: ${buffer.length}`);
+// 				if (buffer.length > max_size) {
+// 					ctx.setStatusCode(413);
+// 					// Technically it is not a normal event but a stream instead
+// 					console.log('called in exceed size')
+// 					// ctx.req.destroy('Post entity too big'); // Destroy the readable stream
+
+// 					return reject('Post entity too big');
+// 					/*	Reject with error msg since the execution should not continue with this error
+// 						Since the entity too big, I did not receive the full message, thus the request should not
+// 						continue, and I should thus resolve, but set the 
+// 						Reject and ask let finalHandler deal with the error n send back a 500	*/
+// 				}
+// 			}
 
 // module.exports = (ctx) => {
 // 	return new Promise((resolve, reject) => {
@@ -104,3 +117,4 @@ module.exports = (ctx) => {
 // 			Which will allow it to access 'buffer' directly? Not exactly clear on this yet.  */
 // 	});
 // }
+
