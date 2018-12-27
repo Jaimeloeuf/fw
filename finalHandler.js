@@ -14,6 +14,10 @@
 	How do I serialize res_body and make it into a readable stream to pipe it into 'res' writable stream
 	Maybe allow one more option in the handler to specify if they want the payload to be serialized
 	Include something to deal with all the errors. Like send them back to the client or log them
+
+	Send the errors in the error array back to the user if and only if ther error is in the
+	400 range. If the error is not set OR in the 500 range, just send the statuscode back,
+	and log the errors in the error array without sending them to the user.
 */
 
 // Dependencies
@@ -30,19 +34,18 @@ function finalHandler(ctx) {
 	ctx.res.writeHead((ctx.error.length && ctx.statusCode < 400) ? 500: ctx.statusCode, ctx.res_headers);
 	// Send the message body back to the client and end the connection
 	ctx.res.end(res_body);
-	return ctx; // To trigger the next .then method
 }
 
 // Global variable to track number of completed requests.
 var reqCount = 0;
 
 function devMode(ctx) {
+	console.timeEnd('Cycle time'); // Time taken for full req/res cycle including time for logging/debugging above
 	finalHandler(ctx); // Call the res, finalHandler
 	// Do all the logging and stuff here
 	debug.logout_params(ctx); // Log out the ctx object for debugging
 	console.log(`Servicing req number: ${++reqCount}`); // Count the nummber of requests serviced
 	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
-	console.timeEnd('Cycle time'); // Time taken for full req/res cycle including time for logging/debugging above
 }
 
 /*	Auto choose a finalHandler based on current environment mode
