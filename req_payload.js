@@ -37,7 +37,7 @@ module.exports = (ctx) =>
 				else {
 					console.log(`Length here: ${buffer.length}`);
 					console.log(`called in exceed size, ${++num}`)
-					ctx.req.pause();
+					ctx.req.pause(); // Stops/Pauses the incoming stream from emitting data eventn
 
 					ctx.setStatusCode(413); // Set HTTP status code for 'entity too large'
 					buffer = ''; // Clear/delete the received data in the buffer
