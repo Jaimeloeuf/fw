@@ -1,61 +1,22 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
+/*	@Doc
+	Ques: Why return or resolve values are not needed for route handlers?
+	Ans: For the definitions of the route handlers, there is no need to return anything or to
+	create or return any Promises. Because in the server module, the route handler is called
+	with the 'await' keyword, meaning that even if the routeHandler is not a Promise or does
+	not return a Promise, the await keyword will convert the returned value to a Resolved Promise.
+*/
+
 // Dependencies
 const router = require('./router');
 
-const setHandler = (method, route, handler) => router[method][route] = fnModifier(handler);
+// Function for setting a new route and its handler into the router HashMap
+const setHandler = (method, route, handler) => router[method][route] = handler;
 
-module.exports.route = setHandler;
-
+module.exports.route = setHandler; // The generic route and handler setter.
+// Below are the function wrappers for setHandler function with the specified verb.
 module.exports.post = (route, handler) => setHandler('POST', route, handler);
 module.exports.get = (route, handler) => setHandler('GET', route, handler);
 module.exports.put = (route, handler) => setHandler('PUT', route, handler);
 module.exports.del = (route, handler) => setHandler('DEL', route, handler);
-
-
-/*	fnModifier function  takes in a function and returns a function that has been modified to call
-	the original function and return the ctx object. By using this modifier, the route handlers
-	defined in the app module/file that uses this framework does not need to return 'ctx' everytime.
-	'ctx' needs to be returned no matter what to trigger the next .then method
-	
-	This is great for normal sync and sequenced functions, but the problems lies with Promises.
-	Especially with the move towards the use of Async/Await in the server module, it expects a
-	Promise to be returned. Unlike the old way which will still work.
-*/
-
-const fnModifier = (fn) => (ctx) => { fn(ctx); return ctx; }; // Inlined shorthand function definition
-
-const fnModifier = (fn) => (ctx) => fn(ctx) || ctx; // This modifier causes evaluation of undefined every single time.
-
-/* Below 2 methods Only supports returning sequential functions and promise returning functions. Does not support async */
-const fnModifier = (fn) => {
-	if (fn instanceof Promise)
-		return (ctx) => {
-			return new Promise((resolve, reject) => {
-				fn(ctx)
-					.then((data) => {
-						// If the handler defined did not resolve with ctx, then resolve with ctx.
-						if (data)
-							return resolve(data);
-						return resolve(ctx);
-					})
-					.catch((error) => reject(error));
-			})
-		};
-	else
-		return (ctx) => {
-			fn(ctx);
-			return ctx;
-		};
-
-}
-
-const fnModifier = (fn) => {
-	if (!(fn instanceof Promise)) {
-		return (ctx) => {
-			fn(ctx);
-			return ctx;
-		};
-	}
-	return fn;
-}

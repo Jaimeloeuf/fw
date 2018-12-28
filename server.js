@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
 
 // 	// Promise Chaining to respond back to client
 // 	getPayload(ctx)
-// 		.then((ctx) => bodyParser(ctx))
+// 		.then(bodyParser)
 // 		.then((ctx) => router(ctx)(ctx))
 // 		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
 // 		.finally(() => finalHandler(ctx))
