@@ -7,14 +7,21 @@
 // Dependencies
 const fs = require('fs');
 
-module.exports.open = (file, option = 'a') => {
-	/*	Option for opening the file
-		a: append to the file
-		wx: write to the file
+module.exports.open = (file, flags = 'r') => {
+	/*	Flags for opening the file:
+		r: read, err if file does not exist
+		r+: read & write, err if file does not exist
+		w: write, file is created if it does not exist or truncated if it exists
+		wx: create and write to the file, err if file already exists
+		w+: read & write, file is created if it does not exist or truncated if it exists
+		wx+: read & write, err if file already exists
+		a: append, file is created if it does not exist
+		ax: append, err if file already exists
+		a+: read & append, file is created if it does not exist
+		ax+: read & append, err if file already exists
 	*/
-
 	return new Promise((resolve, reject) => {
-		fs.open(file, option, (err, fileDescriptor) => {
+		fs.open(file, flags, (err, fileDescriptor) => {
 			if (!err && fileDescriptor)
 				return resolve(fileDescriptor);
 			return reject(err); // Could open file for appending

@@ -51,18 +51,3 @@ module.exports = async (req, res) => {
 	try { await finalHandler(ctx); }
 	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
 }
-
-/* Below is the old async code using Promise chaining for sequencing */
-// module.exports = (req, res) => {
-// 	// Create a new 'ctx' object with (req, res) objects
-// 	console.time('Cycle time'); // For dev-env only
-// 	const ctx = new Ctx(req, res);  // @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
-
-// 	// Promise Chaining to respond back to client
-// 	getPayload(ctx)
-// 		.then(bodyParser)
-// 		.then((ctx) => router(ctx)(ctx))
-// 		.catch((err) => ctx.newError(err)) // perhaps set the status code to 500?
-// 		.finally(() => finalHandler(ctx))
-// 		.catch((err) => console.error(err)); // @TODO change this to use the universal logging and error collection method
-// }
