@@ -6,7 +6,7 @@
 */
 
 // Dependencies
-const F = require('./file');
+const { open, read, append, readDir, close } = require('./file');
 var path = require('path');
 var zlib = require('zlib');
 
@@ -16,41 +16,54 @@ var lib = {};
 // Base directory for storing the log files, should be read from the config module
 lib.baseDir = path.join(__dirname, '/../.logs/');
 
-log.append = function (file, str, callback) {
+log.append = function (file, str) {
 	// Append a string to the given log file. Create the file if it does not exist
 	return new Promise((resolve, reject) => {
-		// Open the file for appending
-		F.open(file)
+		open(file)
 			.then((fileDescriptor) => append(fileDescriptor, str))
-			.then(lib.close) // Pass close function's reference to be called when above resolves.
+			.then(close) // Pass close function's reference to be called when above resolves.
 			.then(resolve) // Call resolve when all is done
 			.catch(reject); // Reject any errors and allow the error to bubble further up
 	});
 };
 
+// Append a string to the given log file. Create the file if it does not exist
+log.append = async (file, str) => {
+	try {
+		let fileDescriptor = await open(file);
+		await append(fileDescriptor, str);
+		await close(fileDescriptor); // Pass close function's reference to be called when above resolves.
+	} catch (err) {
+
+	}
+
+	return new Promise((resolve, reject) => {
+			.catch (reject); // Reject any errors and allow the error to bubble further up
+	});
+};
+
 
 // List all the logs, and optionally include the compressed logs
-lib.list = function (includeCompressedLogs, callback) {
-	fs.readdir(lib.baseDir, function (err, data) {
-		if (!err && data && data.length > 0) {
-			var trimmedFileNames = [];
-			data.forEach(function (fileName) {
-
-				// Add the .log files
-				if (fileName.indexOf('.log') > -1) {
-					trimmedFileNames.push(fileName.replace('.log', ''));
+lib.list = function (includeCompressedLogs) {
+	return new Promise((resolve, reject) => {
+		readDir(lib.baseDir)
+			.then((data) => {
+				if (data && data.length > 0) {
+					let fileNames = [];
+					data.forEach((fileName) => {
+						if (fileName.indexOf('.log') > -1)
+							fileNames.push(fileName.replace('.log', '')); // Trim and Add the .log files
+						else if (fileName.indexOf('.gz.b64') > -1 && includeCompressedLogs)
+							fileNames.push(fileName.replace('.gz.b64', '')); // Trim and Add the .gz files
+						else
+							fileNames.push(`Unknown file type: ${fileName}`); // Add the files of unknown type
+					});
+					return resolve(trimmedFileNames);
 				}
-
-				// Add the .gz files
-				if (fileName.indexOf('.gz.b64') > -1 && includeCompressedLogs) {
-					trimmedFileNames.push(fileName.replace('.gz.b64', ''));
-				}
-
-			});
-			callback(false, trimmedFileNames);
-		} else {
-			callback(err, data);
-		}
+				else
+					return reject('No data available'); // If data 'null' or 'undefined'
+			})
+			.catch((err) => reject(err)); // Other errors, like those bubbled up from readDir
 	});
 };
 
@@ -58,6 +71,11 @@ lib.list = function (includeCompressedLogs, callback) {
 lib.compress = function (logId, newFileId, callback) {
 	var sourceFile = logId + '.log';
 	var destFile = newFileId + '.gz.b64';
+
+	read(lib.baseDir + sourceFile)
+		.then()
+		.catch((err) => reject(err)); // Let error bubble up
+
 
 	// Read the source file
 	fs.readFile(lib.baseDir + sourceFile, 'utf8', function (err, inputString) {
