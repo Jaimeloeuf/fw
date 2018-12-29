@@ -6,43 +6,37 @@
 */
 
 // Dependencies
-const { open, read, append, readDir, close } = require('./file');
-var path = require('path');
-var zlib = require('zlib');
-const compress = require('./compress');
+const { open, read, write, append, readDir, close } = require('./file');
+const { compress, uncompress } = require('./compress');
 
 // Container for module (to be exported)
-var lib = {};
+const lib = {};
 
 // Base directory for storing the log files, should be read from the config module
-lib.baseDir = path.join(__dirname, '/../.logs/');
+var { join } = require('path');
+lib.baseDir = join(__dirname, '/../.logs/');
 
-log.append = function (file, str) {
+
+// Below are 2 different versions of the same functionality one using Promise chaining and one using async/await
+lib.append = function (file, str) {
 	// Append a string to the given log file. Create the file if it does not exist
 	return new Promise((resolve, reject) => {
-		open(file)
+		open(lib.baseDir + file + '.log')
 			.then((fileDescriptor) => append(fileDescriptor, str))
 			.then(close) // Pass close function's reference to be called when above resolves.
 			.then(resolve) // Call resolve when all is done
 			.catch(reject); // Reject any errors and allow the error to bubble further up
 	});
 };
-
-// Append a string to the given log file. Create the file if it does not exist
-log.append = async (file, str) => {
+lib.append = async (file, str) => {
 	try {
-		let fileDescriptor = await open(file);
+		let fileDescriptor = await open(lib.baseDir + file + '.log');
 		await append(fileDescriptor, str);
 		await close(fileDescriptor); // Pass close function's reference to be called when above resolves.
-	} catch (err) {
-
+	} catch (err) { // Let error bubble up
+		return err;
 	}
-
-	return new Promise((resolve, reject) => {
-			.catch (reject); // Reject any errors and allow the error to bubble further up
-	});
 };
-
 
 // List all the logs, and optionally include the compressed logs
 lib.list = function (includeCompressedLogs) {
@@ -69,75 +63,34 @@ lib.list = function (includeCompressedLogs) {
 };
 
 // Compress the contents of one .log file into a .gz.b64 file within the same directory
-lib.compress = function (logId, newFileId, callback) {
-	var sourceFile = logId + '.log';
-	var destFile = newFileId + '.gz.b64';
-
-	read(lib.baseDir + sourceFile)
-		.then((fileData) => compress(fileData))
-		.then((compressedData) => )
-		.catch((err) => reject(err)); // Let error bubble up
-
-
-	// Read the source file
-	fs.readFile(lib.baseDir + sourceFile, 'utf8', function (err, inputString) {
-		if (!err && inputString) {
-			// Compress the data using gzip
-			zlib.gzip(inputString, function (err, buffer) {
-				if (!err && buffer) {
-					// Send the data to the destination file
-					fs.open(lib.baseDir + destFile, 'wx', function (err, fileDescriptor) {
-						if (!err && fileDescriptor) {
-							// Write to the destination file
-							fs.writeFile(fileDescriptor, buffer.toString('base64'), function (err) {
-								if (!err) {
-									// Close the destination file
-									fs.close(fileDescriptor, function (err) {
-										if (!err) {
-											callback(false);
-										} else {
-											callback(err);
-										}
-									});
-								} else {
-									callback(err);
-								}
-							});
-						} else {
-							callback(err);
-						}
-					});
-				} else {
-					callback(err);
-				}
-			});
-
-		} else {
-			callback(err);
-		}
-	});
+lib.compress = async (logId, newFileId, callback) => {
+	try {
+		let fileData = await read(lib.baseDir + logId + '.log'); // Read the source file
+		let compressedData = await compress(fileData); // Compress the data using gzip
+		let fileDescriptor = await open(newFileId + '.gz.b64', 'wx'); // Open the destination file
+		await write(fileDescriptor, compressedData.toString('base64')); // Encode to base64 and write to destination file
+		await close(fileDescriptor); // Close the destination file
+	} catch (err) { // Let error bubble up
+		return err;
+	}
 };
 
-// Decompress the contents of a .gz file into a string variable
-lib.decompress = function (fileId, callback) {
-	var fileName = fileId + '.gz.b64';
-	fs.readFile(lib.baseDir + fileName, 'utf8', function (err, str) {
-		if (!err && str) {
-			// Inflate the data
-			var inputBuffer = Buffer.from(str, 'base64');
-			zlib.unzip(inputBuffer, function (err, outputBuffer) {
-				if (!err && outputBuffer) {
-					// Callback
-					var str = outputBuffer.toString();
-					callback(false, str);
-				} else {
-					callback(err);
-				}
-			});
-		} else {
-			callback(err);
+// Decompress the contents of a .gz file
+lib.decompress = async (fileId, newFile) => {
+	try {
+		let fileData = await read(lib.baseDir + fileId + '.gz.b64'); // Better construct this, perhaps a ternary check?
+		let uncompressedData = await uncompress(Buffer.from(fileData, 'base64'));
+		if (newFile) {
+			// If newfile is a file path and not undefined, then save the string data into that file
+			let fileDescriptor = await open(newFile, 'wx');
+			await write(fileDescriptor, uncompressedData);
+			await close(fileDescriptor);
+			return resolve();
 		}
-	});
+		return resolve(uncompressedData); // Return decompressed data if no file is specified
+	} catch (err) { // Let error bubble up
+		return err;
+	}
 };
 
 // Truncate a log file

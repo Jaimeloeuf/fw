@@ -7,9 +7,14 @@
 // Dependencies
 const fs = require('fs');
 
-module.exports.open = (file) => {
+module.exports.open = (file, option = 'a') => {
+	/*	Option for opening the file
+		a: append to the file
+		wx: write to the file
+	*/
+
 	return new Promise((resolve, reject) => {
-		fs.open(lib.baseDir + file + '.log', 'a', (err, fileDescriptor) => {
+		fs.open(file, option, (err, fileDescriptor) => {
 			if (!err && fileDescriptor)
 				return resolve(fileDescriptor);
 			return reject(err); // Could open file for appending
@@ -24,6 +29,16 @@ module.exports.read = (file_path, encoding = 'utf8') => {
 			if (err)
 				return reject(err);
 			return resolve(fileData);
+		});
+	});
+};
+
+module.exports.write = (fileDescriptor, data) => {
+	return new Promise((resolve, reject) => {
+		fs.writeFile(fileDescriptor, data, (err) => {
+			if (err)
+				return reject(err);
+			return resolve();
 		});
 	});
 };
