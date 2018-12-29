@@ -9,6 +9,7 @@
 const { open, read, append, readDir, close } = require('./file');
 var path = require('path');
 var zlib = require('zlib');
+const compress = require('./compress');
 
 // Container for module (to be exported)
 var lib = {};
@@ -73,7 +74,8 @@ lib.compress = function (logId, newFileId, callback) {
 	var destFile = newFileId + '.gz.b64';
 
 	read(lib.baseDir + sourceFile)
-		.then()
+		.then((fileData) => compress(fileData))
+		.then((compressedData) => )
 		.catch((err) => reject(err)); // Let error bubble up
 
 
