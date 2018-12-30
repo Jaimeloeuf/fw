@@ -61,6 +61,11 @@ app.get('/ping', (ctx) => {
 });
 ```
 
+### About the 'ctx' object created from the Ctx class
+The status code property 'statusCode' is a write once and read only property. Meaning that you can only set this value once throughout the request/response cycle. If you try to set it more than once, a error will be thrown and your client will receive a 500 status code.
+The status code to be returned to the client is 200 by default. The framework will not change this value by itself unless there is an error in the error array of the 'ctx' object and the status code is set below the error code ranges above 400, the framework will then return a 500 to client to indicate internal error.
+So if your client is getting back a 500 code even though you did not set it to 500, check for errors by looking into the error array of the 'ctx' object by turning on dev mode to allow debug function to run.
+
 ### Misc info
 To Change memory limit/use of the node process, use the below code and change 1024 to desired memory size in MB
 ```bash

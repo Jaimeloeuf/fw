@@ -5,8 +5,8 @@
 config:
   target: 'http://localhost:3000/'
   phases:
-    - duration: 60
-      arrivalRate: 20
+    - duration: 100
+      arrivalRate: 1000000
   defaults:
     # headers:
       # x-my-service-auth: '987401838271002188298567'
@@ -14,3 +14,5 @@ scenarios:
   - flow:
     - get:
         url: "/sample"
+    - get:
+        url: "/ping"

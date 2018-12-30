@@ -34,10 +34,12 @@ const bodyParser = require('./body_parser'); // Promise returning function for p
 const router = require('./router'); // Function/router for getting a route handler for a specific route.
 const finalHandler = require('./finalHandler'); // Final route Handler for responding back to the client.
 
-// At server start, display avail memory usage. Convert avail memory from bytyes to MB and round to 2 d.p.
+// At server start, display avail memory, and current memory usage. Convert avail memory from bytyes to MB and round to 2 d.p.
 console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
+console.log(`Current Mem usage: ${(process.memoryUsage().rss / 1024 / 1024).toFixed(4)}MB`);
 
 module.exports = async (req, res) => {
+	console.log('new req!'); // Debug log
 	console.time('Cycle time'); // To keep track of time needed per req/res cycle // For dev-env only.
 	const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
