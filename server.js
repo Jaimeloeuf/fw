@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 	try { // Main async block sequenced inside a try/catch block
 		await getPayload(ctx);
 		await bodyParser(ctx);
-		await router(ctx)(ctx); // Get a route Handler from the router and call the handler
+		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
 	} catch (err) { ctx.newError(err); } // Add error into the error array.
 
 	try { await finalHandler(ctx); }

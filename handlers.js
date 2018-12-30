@@ -11,18 +11,19 @@
 // Dependencies
 const { createToken, verify } = require('./token');
 
-const handler = {};
+const handlers = {};
 
-handler.login = (ctx) => {
+
+handlers.login = (ctx) => {
 	return createToken(ctx);
 };
 
-handler.user = (ctx) => {
+handlers.user = (ctx) => {
 	return verify(ctx);
 }
 
 // Login handler
-// handler.login = (ctx) => {
+// handlers.login = (ctx) => {
 // 	// if (async auth_db(headers.authentication)) {
 // 	// 	await ok();
 // 	// 	Add cookie to Headers of Response object
@@ -32,22 +33,20 @@ handler.user = (ctx) => {
 // 	return ctx; // To trigger the next .then method
 // };
 // logout handler
-handler.logout = (ctx) => {
+handlers.logout = (ctx) => {
 
-	return ctx; // To trigger the next .then method
 };
 
 // Sample handler using 'ctx'
-handler.sample = (ctx) => {
+handlers.sample = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
 	ctx.setStatusCode(201);
 	ctx.res_body = { 'handler name': 'sample handler' };
-	return ctx; // To trigger the next .then method
 };
 
 // Example code below to test out the idea
 // Sample handler to test returning a Promise using 'ctx'
-handler.sample2 = (ctx) => {
+handlers.sample2 = (ctx) => {
 	// Send back a HTTP code and a 'res' payload
 	return new Promise((resolve, reject) => {
 		ctx.setStatusCode(201);
@@ -61,16 +60,16 @@ handler.sample2 = (ctx) => {
 	});
 };
 
-// Ping handler to see if server is up
-// Actually dont need to do anything here as status code 200 is the default value
-handler.ping = (ctx) => {
-	// Actually the statusCode does need to be set, as 200 is the default value
+
+// Ping handler to see if server is up, nothing needs to be done as status code 200 is the default value
+handlers.ping = (ctx) => {
+	// statusCode does need to be set since 200 is the default value
+	// But by setting it once, I technically 'freeze' it and prevent it from being set to other values
 	ctx.setStatusCode(200); // Send back a HTTP code to indicate server is up
-	return ctx; // To trigger the next .then method
 };
 
 // Handler that will test the server's functionality when called and return a diagnostic report when done.
-handler.test = (ctx) => {
+handlers.test = (ctx) => {
 	// Admin privilleges / permissions are needed to use this handler
 	// Verify identity with JWT or Auth method? It will depend on whether this server is a service or identity provider.
 	// If identity provider that provides JWT, then user needs to get the JWT first and then call this route
@@ -82,23 +81,20 @@ handler.test = (ctx) => {
 };
 
 // Not found handler
-handler.notFound = (ctx) => {
+handlers.notFound = (ctx) => {
 	ctx.setStatusCode(404); // Send back the HTTP code to indicate route not defined
-	return ctx; // To trigger the next .then method
 };
 
 // Invalid request Method handler
-handler.invalidReqMethod = (ctx) => {
+handlers.invalidReqMethod = (ctx) => {
 	ctx.setStatusCode(501); // Send back the HTTP code to indicate request method not accepted
-	return ctx; // To trigger the next .then method
 };
 
-handler.forbidden = (ctx) => {
+handlers.forbidden = (ctx) => {
 	// User has authenticated, but does not have permission for the route requested.
 	// E.g. A user using client crendentials to request for a admin page.
 
 	ctx.setStatusCode(403);
-	return ctx; // To trigger the next .then method
-}
+};
 
-module.exports = handler;
+module.exports = handlers;
