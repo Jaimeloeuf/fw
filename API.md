@@ -19,8 +19,6 @@ meaning the variable will be a user ID with a type of 'integer'
 /logout/<hex: userID> // Invalidate the user with 'userID''s JWT
 ```
 
-
-
 ## Full list of User APIs	(Users as in people who want to book services)
 - /user/<hex: userID>
 - /user/<hex: userID>/create	// only for admin accounts

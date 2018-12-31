@@ -20,4 +20,3 @@ module.exports.post = (route, handler) => setHandler('POST', route, handler);
 module.exports.get = (route, handler) => setHandler('GET', route, handler);
 module.exports.put = (route, handler) => setHandler('PUT', route, handler);
 module.exports.del = (route, handler) => setHandler('DEL', route, handler);
-
