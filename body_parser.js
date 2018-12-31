@@ -6,8 +6,8 @@ const { parse: urlencodedParser } = require('querystring');
 /*	@TODO
 	See if this function can be potentially memoized. Esp. the JSON parsing part
 */
-module.exports = (ctx) => {
-	return new Promise((resolve, reject) => {
+module.exports = (ctx) =>
+	new Promise((resolve, reject) => {
 		// Parse payload if any
 		if (ctx.req_body) {
 			if (ctx.checkContentType('application/json')) { // Check for JSON format
@@ -32,4 +32,3 @@ module.exports = (ctx) => {
 		// resolve called after if block Promise is always resolved even if payload is empty.
 		resolve(); // Do I need to return the resolve now? Since this is the last line of code in this block
 	});
-};

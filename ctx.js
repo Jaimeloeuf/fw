@@ -11,7 +11,10 @@
 // Dependencies
 const url = require('url'); // Used to parse the url from the request object.
 
-class Ctx {
+// A map of allowed HTTP request methods. Will return true if a valid HTTP method is used as a key.
+const allowed_mtds = new Map([['GET', true], ['POST', true], ['PUT', true], ['DEL', true]]);
+
+module.exports = class Ctx {
 	constructor(req, res) {
 		this.req = req;
 		this.res = res;
@@ -23,7 +26,14 @@ class Ctx {
 		// Get the path. Remove '/' from the start and the end, but keep those in the middle.
 		this.path = this.url.pathname.replace(/^\/+|\/+$/g, '');
 		// Get the request method, make all upper case for consistency
-		this.method = req.method.toUpperCase();
+		this.method = ((mtd) => {
+			if (allowed_mtds.get(mtd.toUpperCase()))
+				return mtd;
+			else {  // call finalHandler? simply pause the req stream
+				this.setStatusCode(501); // 501 status code --> for method not recognized
+				this.setContinue(false);
+			}
+		})(req.method);
 		// Get headers as an object
 		this.headers = req.headers;
 		this.userAgent = this.headers['user-agent'];
@@ -62,16 +72,26 @@ class Ctx {
 		// Method to push new error into the error array.
 		this.newError = (err) => this.error.push(err);
 
-		// Method for setting statusCode, use this method to set the statusCode to lock the value in after use.
+		// Method for setting statusCode, use this method to set the statusCode and lock the value in after use.
 		this.setStatusCode = (code) => {
 			// Set value and prevent this property from being modified again.
 			try { Object.defineProperty(this, 'statusCode', { value: code, writable: false }); }
 			catch (err) { this.newError(err); } // Error will be thrown if this method called more than once.
 		};
+
+		// Method for setting continue, use this method to set continue state and lock the value in after use.
+		this.stop = () => {
+			// Set value and prevent this property from being modified again.
+			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
+			catch (err) { } // It does not matter if this method is called more than once, error will be ignored.
+		};
 	}
 };
 // The default status code returned to the client is 200 and this property cannot be deleted
 Object.defineProperty(Ctx.prototype, 'statusCode', { configurable: false, value: '200' });
+// The default continue state is true, and this property cannot be deleted
+Object.defineProperty(Ctx.prototype, 'continue', { configurable: false, value: true });
+
 
 /* With this design, the code in the handler will execute finnish first before it enters finalHandler, and the finalHandler
 	will then deal with this redirect. */
@@ -111,5 +131,3 @@ function getCookies(cookie) {
 		}
 	}
 }
-
-module.exports = Ctx;
