@@ -1,7 +1,7 @@
 'use strict'; // Enforce use of strict verion of JavaScript
 
 /*	@Doc
-	Ques: Why return or resolve values are not needed for route handlers?
+	Ques: Why return/resolve values are not needed for route handlers and call to next function not needed?
 	Ans: For the definitions of the route handlers, there is no need to return anything or to
 	create or return any Promises. Because in the server module, the route handler is called
 	with the 'await' keyword, meaning that even if the routeHandler is not a Promise or does
@@ -20,3 +20,4 @@ module.exports.post = (route, handler) => setHandler('POST', route, handler);
 module.exports.get = (route, handler) => setHandler('GET', route, handler);
 module.exports.put = (route, handler) => setHandler('PUT', route, handler);
 module.exports.del = (route, handler) => setHandler('DEL', route, handler);
+
