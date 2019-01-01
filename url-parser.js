@@ -97,6 +97,48 @@ function url_parser3(routes_map, url) {
 	return undefined;
 }
 
+function url_parser3(routes_map, url) {
+	let url_array = tokenize(url);
+	let url_token_count = url_array.length;
+	let variables, token; // 'variables' hold variable data extracted from url with prototype format
+
+	for (let [key, value] of routes_map) // Loop thru entire private_routes_prototype HashMap
+		if (url_token_count === value.token_count) // Check if number of token same
+		{
+			variables = {};
+			for (let i = value.token_count - 1; true; i--) // Check/test if this loop works
+			{
+				token = value.token_array[i];
+				if (token.charAt(0) === ':') // If the token in Map starts with a ':' to indicate variable, then read and store the variable into the variables object
+					variables[token.slice(1)] = url_array[i]; // Read variable in URL into object
+				else if (token !== url_array[i])
+					break; // Skip this prototype and go to the next one
+				if (!i)
+					return variables; // When all tokens looped through
+				// In this case wouldn't it be better to use a reverse while loop.
+			}
+		}
+
+	for (let [key, value] of routes_map) // Loop thru entire private_routes_prototype HashMap
+		if (url_token_count === value.token_count) // Check if number of token same
+		{
+			variables = {}; // reset the variables object
+			for (let i = value.token_count - 1; true; i--) // Basically a reverse while loop.
+			{
+				token = value.token_array[i];
+				if (token.charAt(0) === ':') // If the token in Map starts with a ':' to indicate variable, then read and store the variable into the variables object
+					variables[token.slice(1)] = url_array[i]; // Read variable in URL into object
+				else if (token !== url_array[i])
+					break; // Skip this prototype and go to the next one
+				if (!i)
+					return variables; // When all tokens looped through
+			}
+		}
+
+
+	return undefined; // Unneccessary as the function will auto return a undefined when nothing is defined to be returned.
+}
+
 function tokenize(url) {
 	return url.split('/');
 }
@@ -124,21 +166,6 @@ function body_parser(request, response, parse_options) {
 	response.writeHead(); // Add more stuff if needed
 	request.write(); // Add more stuff if needed to the request object
 }
-
-// let env_var = {
-// 	userID: 'userid'
-// }
-// console.log(getResource(`user/:${env_var.userID}`, 'user/gsus'));
-/*
-Create files with functions export from them and leave them in folders like php files.
-The browser will make a request to for example login.js
-Then node server will route it to Get or Post handler
-Then it will require(request.url.last_part),
-then if the function exists, execute it, so smth like php file requests.
-If file not avail,
-send user a 404 page or smth else
-*/
-
 
 /*	I have a router, that is a object that have key/value pairs.
 	The keys are the route prototypes
