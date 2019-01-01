@@ -47,7 +47,7 @@ module.exports = (ctx) => {
 	If none defined, use the notFound handler. */
 	if (router)
 		return router[ctx.path] || handler.notFound; // Using OR operator, not sure if this work, needs testing
-		// return router[ctx.path] ? router[ctx.path] : handler.notFound; // Using ternary operator
+	// return router[ctx.path] ? router[ctx.path] : handler.notFound; // Using ternary operator
 
 	// If no such router for request method, use the invalidReqMethod handler to deal with the request.
 	return handler.invalidReqMethod;
@@ -61,34 +61,40 @@ module.exports = (ctx) => {
 // ]);
 
 
-const lg = (d) => console.log(d);
-
+const lg = (d) => console.log(d); // Simplified console log
 var totest = 'F34';
-
+isHex(totest);
 function isHex(hex) {
 	let b10 = parseInt(hex, 16); // Convert to base 10
 	// See if the base 10 value converted back to base 16 matches the input.
 	return (b10.toString(16) === hex.toLowerCase()) ? b10 : false;
 }
 
+function getDynamicRoute(ctx) {
+	// find the prototype based on the ctx.path
+	// Extract and store the variables into the req_params property of ctx object.
 
-/*	Total of 2 'routers'
-	- Router for all static URIs
-	- Router for dynamic URIs
-*/
+	ctx.req_params = { ...variables }; // Spread the variables thing in here??
+	ctx.req_params = variables; // Why not just directly write to ctx.req_params
 
+	return handler || handler.notFound; // Return the handler found, else return the notFound handler
+	// Should above line be here or be inside the main router function.
+}
 
-var router; // Global variable, 'create once and use many times' for below
-module.exports = (ctx) => {
-	// Get a router based on the request method
-	router = routers[ctx.method];
-	/* If the request method is valid with a valid router
-	Check the router object/hashmap with the request route for a handler.
-	If none defined, use the notFound handler. */
-	if (router)
-		return router[ctx.path] || handler.notFound; // Using OR operator, not sure if this work, needs testing
-		// return router[ctx.path] ? router[ctx.path] : handler.notFound; // Using ternary operator
+// Second router to test the new idea of having seperate routers for static and dynamic routes
+module.exports.router2 = (ctx) => {
+	/*	Get a static routes router based on the request method
+		Don't need to check if request method is a valid verb as it is checked at ctx object creation
+		If none defined, use the notFound handler. */
+	routers[ctx.method][ctx.path] || getDynamicRoute(ctx); // If no static routes, call the dynamic routes, alse call the notfound
 
-	// If no such router for request method, use the invalidReqMethod handler to deal with the request.
-	return handler.invalidReqMethod;
+	return handler.invalidReqMethod; // Technically this should still be assigned to the server
+	/*	when a invalid request method comes in:
+		Stop and prevent the next function from getting payload
+		Skip the parsing module automatically as the req body is empty
+		Why not just set the value of req_body to be null and prevent write access to the object property
+		then getPayload will throw an error
+		So need to prevent that from throwing an error, possible to ask the req_payload to check if it the
+		property is forzen? If it is frozen then skip the whole chunk.
+	*/
 };

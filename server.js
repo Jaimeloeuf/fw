@@ -50,6 +50,119 @@ module.exports = async (req, res) => {
 		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
 	} catch (err) { ctx.newError(err); } // Add error into the error array.
 
-	try { await finalHandler(ctx); }
+	try { finalHandler(ctx); } // Removed the await
 	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
+}
+
+
+
+// Ver 2
+module.exports = async (req, res) => {
+	console.log('new req!'); // Debug log
+	console.time('Cycle time'); // To keep track of time needed per req/res cycle // For dev-env only.
+	const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
+	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+
+	// I shohuld make the continue thing a event thing, so emit the finnish event
+	if (ctx.continue)
+		try { // Main async block sequenced inside a try/catch block
+			await getPayload(ctx);
+			if (!ctx.continue)
+				break; // Break out of this try catch block to go to the finalHandler
+			await bodyParser(ctx);
+			if (!ctx.continue)
+				break; // Break out of this try catch block to go to the finalHandler
+			await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
+		} catch (err) { ctx.newError(err); } // Add error into the error array.
+
+	try { finalHandler(ctx); } // Removed the await
+	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
+
+	// Promise.resolve(finalHandler(ctx))
+	// 	.catch(console.error) // catch any errors, technically the try catch block is good for catching erros so can test both out first
+}
+
+
+
+// Ver 3
+module.exports = async (req, res) => {
+	console.time('Cycle time'); // To keep track of time needed per req/res cycle // For dev-env only.
+
+	// I shohuld make the continue thing a event thing, so emit the finnish event
+	try { // Main async block sequenced inside a try/catch block
+		const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
+		// Ctx object can throw error at creation and will go to newError directly and then finalHanlder can use it
+		// Just wondering if const is scoped to this try block? Because if so then finalHandler cannot access the reference
+		await getPayload(ctx);
+		if (!ctx.continue)
+			break; // Break out of this try catch block to go to the finalHandler
+		await bodyParser(ctx);
+		if (!ctx.continue)
+			break; // Break out of this try catch block to go to the finalHandler
+		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
+	} catch (err) { ctx.newError(err); } // Add error into the error array.
+
+	Promise
+		.resolve(finalHandler(ctx))
+		.catch(console.error) // catch any errors, technically the try catch block is good for catching erros so can test both out first
+}
+
+
+
+
+
+
+// Ver Everything changed
+module.exports = async (req, res) => {
+	console.log('new req!'); // Debug log
+	console.time('Cycle time'); // To keep track of time needed per req/res cycle // For dev-env only.
+	const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
+	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
+
+	try { // Main async block sequenced inside a try/catch block
+		await getPayload(ctx);
+		await bodyParser(ctx);
+		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
+	} catch (err) { ctx.newError(err); } // Add error into the error array.
+
+	// I shohuld make the continue thing a event thing, so emit the finnish event
+	if (ctx.continue)
+		try { // Main async block sequenced inside a try/catch block
+			await getPayload(ctx);
+			if (!ctx.continue)
+				break; // Break out of this try catch block to go to the finalHandler
+			await bodyParser(ctx);
+			if (!ctx.continue)
+				break; // Break out of this try catch block to go to the finalHandler
+			await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
+		} catch (err) { ctx.newError(err); } // Add error into the error array.
+
+	try { finalHandler(ctx); } // Removed the await
+	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
+
+
+
+
+	// I shohuld make the continue thing a event thing, so emit the finnish event
+	try { // Main async block sequenced inside a try/catch block
+		const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
+		// Ctx object can throw error at creation and will go to newError directly and then finalHanlder can use it
+		// Just wondering if const is scoped to this try block? Because if so then finalHandler cannot access the reference
+		await getPayload(ctx);
+		if (!ctx.continue)
+			break; // Break out of this try catch block to go to the finalHandler
+		await bodyParser(ctx);
+		if (!ctx.continue)
+			break; // Break out of this try catch block to go to the finalHandler
+		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
+	} catch (err) { ctx.newError(err); } // Add error into the error array.
+
+	try { finalHandler(ctx); } // Removed the await
+	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
+
+
+
+
+	Promise.resolve(finalHandler(ctx))
+		.catch(console.error) // catch any errors, technically the try catch block is good for catching erros so can test both out first
 }

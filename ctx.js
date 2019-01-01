@@ -3,25 +3,26 @@
 /* @Doc
 	Copying koa.js idea on using a Ctx object
 	Where Ctx is an object containing both the req and res objects and
-	data parsed from those 'req,res' objects.
-	It exposes a easy to use and clean interface for passing data downstream
-	in a middleware lifecycle, with many commonly used built in methods.
+	data parsed from the given 'req,res' objects.
+	It exposes a easy to use and clean interface for letting data flow downstream in the
+	request/response and middleware lifecycle, with many commonly used methods built in.
 */
 
 // Dependencies
 const url = require('url'); // Used to parse the url from the request object.
+const EE = require('events').EventEmitter;
 
 // A map of allowed HTTP request methods. Will return true if a valid HTTP method is used as a key.
 const allowed_mtds = new Map([['GET', true], ['POST', true], ['PUT', true], ['DEL', true]]);
 
-module.exports = class Ctx {
+module.exports = class Ctx extends EE {
 	constructor(req, res) {
 		this.req = req;
 		this.res = res;
 		this.continue = true; // Property to allow functions to check if they should continue with execution
 
 		/* Parsing data out from the request object */
-		// Parsed url object
+		// Parsed url objects
 		this.url = url.parse(req.url, true);
 		// Get the path. Remove '/' from the start and the end, but keep those in the middle.
 		this.path = this.url.pathname.replace(/^\/+|\/+$/g, '');
@@ -84,6 +85,12 @@ module.exports = class Ctx {
 			// Set value and prevent this property from being modified again.
 			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
 			catch (err) { } // It does not matter if this method is called more than once, error will be ignored.
+			this.emit('stop', functioncaller); // Pass in the function that called this method
+		};
+		
+		this.stop = () => {
+			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
+			catch (err) { return Promise.reject(err) };
 		};
 	}
 };
