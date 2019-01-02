@@ -81,3 +81,34 @@ function getToken(ctx) {
 		ctx.stop(); // Stop execution if no token given and return faillure to function caller.
 	}
 }
+
+
+/* standard token
+	headers:
+		{
+			"typ": "JWT",
+			"alg": "HS256"
+		}
+		{
+			"exp": ,
+			"iat": ,
+			"expiresIn": ,
+			"tokenType": "Bearer",
+			"subject": "retrieve data", // What is the purpose of this token/request?
+			"usrID": 578ec9,
+			"usr": "john@gmail.com",
+			"iss": "bouk.com", // Issuer of the token
+			"aud": "bouk.com/", // Intended audience that should acccept the token
+
+
+			"account type": "consumer", // The type of account that the user has
+			"roles": {
+				// The things/roles that the user is allowed to do
+				"role": "consumer"
+				"booking": "create"
+			}
+			"scope": ["read", "write", "update", "del"]
+
+		}
+
+*/
