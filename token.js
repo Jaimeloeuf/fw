@@ -7,84 +7,77 @@
 	@TODO
 	- look into private Keys and stuff like Asymmetric signing and verifying
 	- Create child processes too, to deal with the parsing and signing as it seems like it
-	will take quite abit of CPU power
+	  will take quite abit of CPU power
 */
 
 // Dependencies
 const jwt = require('jsonwebtoken'); // External dependency from NPM by Auth0
 
-// Mock user for testing purposes only
+// Mock user for testing purposes only. @TODO Remove this code
 const user = {
 	id: 1,
 	username: 'brad',
 	email: 'brad@gmail.com'
 }
 
-// Variables used for signing/verifying tokens
+// Variables used for signing/verifying tokens. Should be read from env or config file.
 const expiresAfter = '100s';
 const signageKey = 'secret';
 
-// Simplified console.log method
-const log = (dat) => console.log(dat);
-
-module.exports.createToken = (ctx) => {
-	// Do the db shit then get back the user to create token. To refactor the create token code too.
-	return new Promise((resolve, reject) => {
+// Function caller to provide data for JWT creation. An optional parameter setToken that defaults to true, used to put token into cookies.
+module.exports.createToken = (ctx, setToken = true, cookie = true) =>
+	new Promise((resolve, reject) => {
+		// Instead of signing 'user', sign ctx.jwt
 		jwt.sign(user, signageKey, { expiresIn: expiresAfter }, (err, token) => {
 			if (err)
-				reject(err); // Reject as it is internal error.
+				return reject(err); // Reject as it is internal error.
 
-			// Write token into a cookie for finalHandler to send back to client
-			// How do I erase the previously issused cookie stored on the client?
-			ctx.res_headers['Set-Cookie'] = token;
-			resolve(ctx);
+			/* 	Dealing with tokens:
+			Write token into a cookie for finalHandler to send back to client
+			How do I erase the previously issused cookie stored on the client? */
+			if (setToken)
+				ctx.res_headers['Set-Cookie'] = token;
+			return resolve();
 		});
 	});
-}
 
 /*
-Verify is to verify the token and send back the decrypted token
+Verify is to verify the token produce the decrypted token
 
 The callback is called with the decoded payload if the signature is valid and optional
-expiration, audience, or issuer are valid. If not, it will be called with the error.
+expiration, audience, or issuer are valid. Else, it will be called with the error.
 */
-module.exports.verify = (ctx) => {
-	getToken(ctx); // Sync call to get the token out of headers
-	return new Promise((resolve, reject) => {
+module.exports.verify = (ctx) =>
+	new Promise((resolve, reject) => {
+		getToken(ctx) // Get token out of headers into ctx.token property
 
 		// Pass in the JWT from the user, the key used to sign the tokens and a callback function
 		jwt.verify(ctx.token, signageKey, (err, decoded_token) => {
 			if (err) {
-				ctx.statusCode = 401; // Forbidden
+				ctx.setStatusCode(403); // Forbidden
 				ctx.newError('Forbidden, invalid auth');
-
 				// if (err === 'invalid audience') // Only true if you add a audience field in the options object
-					// ctx.setStatusCode(40??)
-
+				// ctx.setStatusCode(40??)
 				// Error will not be rejected as it is not a code/server/logic error, but a client side error
+				return resolve(false); // Since it is a client error, resolve with a 'false'
 			}
-			else {
-				// After reading/decrypting the token
-				// Send the token back to function caller
-
-				// Send back the details the client requested for
-				ctx.res_body.message = 'Successfully verified';
-				ctx.res_body.authData = decoded_token; // Probs not going to send this back to the user
-			}
-			resolve(ctx); // Resolve with ctx regardless of errors or success.
+			else
+				ctx.JWT = decoded_token; // After decrypting the token, put data into 'ctx' object for function caller
+			return resolve(true); // Resolve with true to indicate verification success
 		});
-
-	})
-}
+	});
 
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
 function getToken(ctx) {
-	ctx.token = ctx.headers['authorization'].split(' ')[1]; // Split at the space and Get token from array
-	if (typeof ctx.token === 'undefined') // Check if bearer is undefined
-		ctx.statusCode = 401; // If token does not exist or not sent over, respond with a 401 auth-token not provided
+	ctx.token = ctx.headers['authorization'].split(' ')[1]; // Split at space and Get token from array
+	// if (typeof ctx.token === 'undefined') // Check if bearer is undefined
+	// 	ctx.setStatusCode(401); // If token does not exist or not sent over, respond with a 401 auth-token not provided
 
 
-	// if (ctx.token === undefined) // Check if bearer is undefined
-	// 	ctx.statusCode = 403; // Forbidden
+	// Check if bearer is undefined
+	if (typeof ctx.token === 'undefined') {
+		ctx.setStatusCode(401); // If token does not exist or not sent over, respond with a 401 auth-token not provided
+		ctx.stop(); // Stop execution if no token given and return faillure to function caller.
+	}
 }

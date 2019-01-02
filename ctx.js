@@ -44,11 +44,8 @@ module.exports = class Ctx extends EE {
 		this.checkContentType = (type) => type === this.contentType;
 		// Get the query string as an object
 		this.query = this.url.query;
-		// Get the cookies in the headers
+		// Get the cookies in the headers  @TODO implement a method to deal with the cookies above.
 		// cookies: getCookies(req.headers['cookie']),
-		// @TODO implement a method to deal with the cookies above.
-		this.auth = this.headers['authorization'];
-		// token: req.headers.cookie, // Tmp way to get the JWT token stored as a cookie
 
 		/* All things from the req object should be frozen after having their values set unlike the response objects */
 
