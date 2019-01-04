@@ -95,7 +95,7 @@ function getToken(ctx) {
 	headers:
 		{
 			"typ": "JWT",
-			"alg": "HS256"
+			"alg": "HS256" // The algorithm used for the signature is HMAC SHA-256
 		}
 		{
 			"exp": ,
@@ -120,3 +120,63 @@ function getToken(ctx) {
 		}
 
 */
+
+
+
+/* Below is my attempt of creating my own dependency less JWT module */
+
+function createJWE(claims, headers) {
+	if (!headers)
+		headers = {
+			// Standard default headers
+			"typ": "JWT",
+			"alg": "HS256" // The algorithm used for the signature is HMAC SHA-256
+		}
+	const payload = base64URLencode(headers) + "." + base64URLencode(claims);
+	const signature = base64URLencode(HMACSHA256(payload, secret));
+	return encrypt('RSA256', privateKey, payload + "." + signature); // Return the JWE back to function caller to send to the client to store
+
+	// Shorter form of above by getting rid of the signature variable.
+	return encrypt('RSA256', privateKey, payload + "." + base64URLencode(HMACSHA256(payload, secret))); 
+}
+
+
+/* To decrypt,
+	1. Decrypt with private key
+	2. Split the token into its 3 seperate parts
+	3. Verify that the token's alg property in the header is the same as the one used by the server
+	4. Hash the header + payload and check if it is the same as the given signature.
+	5. Parse the payload into a JS object for the service to now use. */
+function verify(JWE) {
+	var JWT = dencrypt('RSA256', privateKey, JWE);
+	JWT = JWT.split('.');
+	if (JWT[0]['alg'] === 'HS256')
+		if (HMACSHA256(JWT[0] + JWT[1], secret) === JWT[2])
+			payload = JSON.parse(JWT[1]);
+}
+
+// Ver 2
+function verify2(JWE, cb) {
+	// Verify and get either an error or
+	return new Promise((resolve, reject) => {
+		var JWT = dencrypt('RSA256', privateKey, JWE);
+		JWT = JWT.split('.');
+		// Only allow HS256 as alg used. So none alg will be rejected
+		if (JWT[0]['alg'] !== 'HS256')
+			reject(new Error('Wrong alg specified in JWT header'));
+		if (HMACSHA256(JWT[0] + JWT[1], secret) !== JWT[2])
+			reject(new Error('The JWT has been tampered with!'));
+		resolve(JSON.parse(JWT[1]));
+	});
+}
+
+async function login() {
+	try {
+		let data = await verify2(JWE);
+		let todos = await db.get_todos(data.userID);
+		if (!todos)
+			throw new Error('No todos for the user')
+	} catch (err) {
+
+	}
+}
