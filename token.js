@@ -98,10 +98,18 @@ function getToken(ctx) {
 			"alg": "HS256" // The algorithm used for the signature is HMAC SHA-256
 		}
 		{
+			// Who this person is (sub, short for subject)
+			// What this person can access with this token (scope)
+			// When the token expires (exp)
+			// Who issued the token (iss, short for issuer)
+
+			// These below declarations are known as Claims, because the token creator claims a set of assertions that can be used to ‘know’ things about the subject. Because the token is signed with a secret key, you can verify its signature and implicitly trust what is claimed.
+
 			"exp": ,
 			"iat": ,
 			"expiresIn": ,
 			"tokenType": "Bearer",
+			"sub":
 			"subject": "retrieve data", // What is the purpose of this token/request?
 			"usrID": 578ec9,
 			"usr": "john@gmail.com",
@@ -137,7 +145,7 @@ function createJWE(claims, headers) {
 	return encrypt('RSA256', privateKey, payload + "." + signature); // Return the JWE back to function caller to send to the client to store
 
 	// Shorter form of above by getting rid of the signature variable.
-	return encrypt('RSA256', privateKey, payload + "." + base64URLencode(HMACSHA256(payload, secret))); 
+	return encrypt('RSA256', privateKey, payload + "." + base64URLencode(HMACSHA256(payload, secret)));
 }
 
 
@@ -171,6 +179,7 @@ function verify2(JWE, cb) {
 }
 
 async function login() {
+	// The idea is that you present your hard credentials once, and then get a token to use in place of the hard credentials.
 	try {
 		let data = await verify2(JWE);
 		let todos = await db.get_todos(data.userID);

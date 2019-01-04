@@ -167,58 +167,6 @@ function body_parser(request, response, parse_options) {
 	request.write(); // Add more stuff if needed to the request object
 }
 
-/*	I have a router, that is a object that have key/value pairs.
-	The keys are the route prototypes
-	The values are the route handler for the route defined in the key
-
-	Look through all the prototypes to find which prototype the requested route fits
-	Using the prototype build the object to hold the variables.
-	Parse out the variables from the requested route.
-
-
-	But what do I do with the variables parsed out?
-	Because in my current server module, the router simplies find a handler
-	base on that route and pass the handler back to the server for the
-	server to call that function. But now, if I were to parse the url,
-	what do I return to the server? The parsed variables or should the router
-	be the one to call the handler?
-	PUT THE VARIABLES INTO THE CTX OBJECT :)
-
-
-call router
-	? look through static routes
-		T: return handler to server module
-	? look through dynamic routes to find a prototype that the requested route matches with
-		T: If a prototype is found
-			- extract the variables out from the requested route.
-			- Store the variable into the 'ctx' object  -->  ctx.url_params, which will be an object
-			- return the handler back to the server module.
-		F: If no route handlers, then return the 404 notFound default handler back to server module
-
-	
-	The problem is that all the handlers have a standard input parameter/arguement list which
-	is the ctx object. So when the server calls the handler function, it just needs to pass it the
-	ctx object, which it has a referenc in the server module. So the other additional variables, how
-	to send it to the route handler? I want it to be like flask, instead of Express when I still
-	need to get those variables out from the ctx.req_params...
-
-
-	So route handlers for static routes should always expect a single arguement of 'ctx' but for
-	dynamic routes, they can expect 'ctx' as the first arguement, but followed will be the
-	porameters that they specified in the route.
-
-	What is the order that express middlewares are executed in?
-	Can a middleware execute after the route handler
-
-	Based on my design, the finalHandler is called right after the route handler ends.
-*/
-
-
-
 function parse(url) {
 
 }
-
-app.get('/user/<hex: userID>', (userID) => {
-	// ctx.url_params['userID']
-});
