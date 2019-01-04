@@ -16,7 +16,7 @@ meaning the variable will be a user ID with a type of 'integer'
 
 ```url
 /logout // Logout for current user. Will invalidate the current User's JWT
-/logout/<hex: userID> // Invalidate the user with 'userID''s JWT
+/logout/<hex: userID> // Invalidate the user's JWT
 ```
 
 ## Full list of User APIs	(Users as in people who want to book services)
@@ -43,9 +43,11 @@ meaning the variable will be a user ID with a type of 'integer'
 
 - /user/<hex: userID>/booking	// Shows all current booking
 - /user/<hex: userID>/booking/all	// Shows all booking from the start
+
 - GET /user/<hex: userID>/booking/<hex: bookingID>/	// Display more detail for a particular booking
 - DEL /user/<hex: userID>/booking/<hex: bookingID>/	// cancel or delete the booking
 - PUT /user/<hex: userID>/booking/<hex: bookingID>/	// Update the booking
+
 - /user/<hex: userID>/booking/<hex: bookingID>
 
 - /user/<hex: userID>/services // Services that the current user is subscribed to

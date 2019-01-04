@@ -83,7 +83,15 @@ function getToken(ctx) {
 }
 
 
-/* standard token
+/*	What should a JWT contain?   (The client holding on to the JWT will be referred to as the owner of the JWT)
+	- The owner's Identity, basically declaring who the user is
+	- What are the resources that the owner can access.
+	- Who issused the JWT token to the user
+	- And who is the JWT intended for? Meaning who or which microservice should accept the token?
+
+	standard token
+
+
 	headers:
 		{
 			"typ": "JWT",
