@@ -13,8 +13,6 @@ module.exports = (ctx) =>
 			if (ctx.checkContentType('application/json')) { // Check for JSON format
 				try { ctx.req_body = JSON.parse(ctx.req_body); }
 				catch (error) { return reject(error); }
-				// ^Why do I need to return a reject here? Oh ya, return stops it from continuing? THast so stupid
-
 				// parseJSON(ctx.req_body)
 				// 	.then((data) => ctx.req_body = data)
 				// 	.catch((err) => reject(err))
@@ -29,6 +27,5 @@ module.exports = (ctx) =>
 			else
 				return reject(`ERROR: Unknown content-type for payload received: ${ctx.contentType}`);
 		}
-		// resolve called after if block Promise is always resolved even if payload is empty.
-		resolve(); // Do I need to return the resolve now? Since this is the last line of code in this block
+		resolve(); // resolve called after 'if block'. Promise is always resolved even if payload is empty.
 	});

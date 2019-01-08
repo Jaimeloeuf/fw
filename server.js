@@ -38,8 +38,7 @@ const finalHandler = require('./finalHandler'); // Final route Handler for respo
 console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
 console.log(`Current Mem usage: ${(process.memoryUsage().rss / 1024 / 1024).toFixed(4)}MB`);
 
-// module.exports = async (req, res) => {
-module.exports.adufhahd = async (req, res) => {
+module.exports = async (req, res) => {
 	debug();
 	const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
 	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
@@ -54,35 +53,7 @@ module.exports.adufhahd = async (req, res) => {
 	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
 }
 
-// Promise
-// 	.resolve(finalHandler(ctx))
-// 	.catch(console.error) // catch any errors, technically the try catch block is good for catching erros so can test both out first
-
-
-const server5 = async (req, res) => {
-	debug();
-	const ctx = await new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
-	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
-
-	ctx.on('stop', () => {
-		console.log('hi')
-		finalHandler(ctx);
-	});
-
-	try { // Main async block sequenced inside a try/catch block
-		await getPayload(ctx);
-		await bodyParser(ctx);
-		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
-	} catch (err) { ctx.newError(err); } // Add error into the error array.
-
-	try { finalHandler(ctx); } // Removed the await
-	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
-}
-
 function debug() {
-	// console.log('new req!'); // Debug log
+	console.log('New req!'); // Debug log
 	console.time('Cycle time'); // To keep track of time needed per req/res cycle // For dev-env only.
 }
-
-
-module.exports = server5;

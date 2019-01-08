@@ -87,7 +87,10 @@ handlers.notFound = (ctx) => {
 
 // Invalid request Method handler
 handlers.invalidReqMethod = (ctx) => {
-	// HTTP code 501 has already been set when ctx object was created.E
+	// HTTP code 501 for request method not implemented.
+	ctx.setStatusCode(501);
+	// Set headers to indicate accepted request methods
+	ctx.res_headers['accepted-methods'] = 'GET, POST, PUT, DEL';
 };
 
 handlers.forbidden = (ctx) => {
