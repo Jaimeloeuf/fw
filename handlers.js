@@ -87,7 +87,7 @@ handlers.notFound = (ctx) => {
 
 // Invalid request Method handler
 handlers.invalidReqMethod = (ctx) => {
-	ctx.setStatusCode(501); // Send back the HTTP code to indicate request method not accepted
+	// HTTP code 501 has already been set when ctx object was created.E
 };
 
 handlers.forbidden = (ctx) => {

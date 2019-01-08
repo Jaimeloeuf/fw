@@ -38,10 +38,9 @@ const routers = {
 	DEL: DEL
 }
 
-var router; // Global variable, 'create once and use many times' for below
 module.exports = (ctx) => {
 	// Get a router based on the request method
-	router = routers[ctx.method];
+	let router = routers[ctx.method];
 	/* If the request method is valid with a valid router
 	Check the router object/hashmap with the request route for a handler.
 	If none defined, use the notFound handler. */
@@ -147,9 +146,9 @@ call router
 */
 
 // Expected usage in the app file
-app.get('/user/<hex: userID>', (userID) => {
+// app.get('/user/<hex: userID>', (userID) => {
 	// ctx.url_params['userID']
-});
+// });
 
 /*	Variable type:
 	An error will be sent to the route handler. Should the app implement the errBack callback strategy?

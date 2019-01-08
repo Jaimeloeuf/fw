@@ -10,16 +10,37 @@
 
 // Dependencies
 const url = require('url'); // Used to parse the url from the request object.
-const EE = require('events').EventEmitter;
+const EventEmitter = require('events');
 
 // A map of allowed HTTP request methods. Will return true if a valid HTTP method is used as a key.
 const allowed_mtds = new Map([['GET', true], ['POST', true], ['PUT', true], ['DEL', true]]);
 
-module.exports = class Ctx extends EE {
+class Ctx extends EventEmitter {
 	constructor(req, res) {
+		super(); // Calling super constructor of the Event Emitter Class
+
 		this.req = req;
 		this.res = res;
-		this.continue = true; // Property to allow functions to check if they should continue with execution
+		// this.continue = true; // Property to allow functions to check if they should continue with execution
+
+		// Any middleware can add its error output to this error object which will be logged tgt at the end.
+		this.error = [];
+		// Method to push new error into the error array.
+		this.newError = (err) => this.error.push(err);
+		// Method for setting statusCode, use this method to set the statusCode and lock the value in after use.
+		this.setStatusCode = (code) => {
+			// Set value and prevent this property from being modified again.
+			try { Object.defineProperty(this, 'statusCode', { value: code, writable: false }); }
+			catch (err) { this.newError(err); } // Error will be thrown if this method called more than once.
+		};
+		// Method for setting continue, use this method to set continue state and lock the value in after use.
+		this.stop = () => {
+			// Set value and prevent this property from being modified again.
+			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
+			catch (err) { } // It does not matter if this method is called more than once, error will be ignored.
+			// this.emit('stop'); // Pass in the function that called this method, so the finalHandler know when stop was called.
+			setImmediate(() => this.emit('stop'))
+		};
 
 		/* Parsing data out from the request object */
 		// Parsed url objects
@@ -32,7 +53,7 @@ module.exports = class Ctx extends EE {
 				return mtd;
 			else {  // call finalHandler? simply pause the req stream
 				this.setStatusCode(501); // 501 status code --> for method not recognized
-				this.setContinue(false);
+				this.stop();
 			}
 		})(req.method);
 		// Get headers as an object
@@ -65,30 +86,6 @@ module.exports = class Ctx extends EE {
 		this.res_cookies = [];
 		// Method for adding more cookies to the array of cookies
 		this.newCookie = (cookie) => this.res_cookies.push(cookie);
-		// Any middleware can add its error output to this error object which will be logged tgt at the end.
-		this.error = [];
-		// Method to push new error into the error array.
-		this.newError = (err) => this.error.push(err);
-
-		// Method for setting statusCode, use this method to set the statusCode and lock the value in after use.
-		this.setStatusCode = (code) => {
-			// Set value and prevent this property from being modified again.
-			try { Object.defineProperty(this, 'statusCode', { value: code, writable: false }); }
-			catch (err) { this.newError(err); } // Error will be thrown if this method called more than once.
-		};
-
-		// Method for setting continue, use this method to set continue state and lock the value in after use.
-		this.stop = () => {
-			// Set value and prevent this property from being modified again.
-			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
-			catch (err) { } // It does not matter if this method is called more than once, error will be ignored.
-			this.emit('stop', functioncaller); // Pass in the function that called this method
-		};
-		
-		this.stop = () => {
-			try { Object.defineProperty(this, 'continue', { value: false, writable: false }); }
-			catch (err) { return Promise.reject(err) };
-		};
 	}
 };
 // The default status code returned to the client is 200 and this property cannot be deleted
@@ -135,3 +132,7 @@ function getCookies(cookie) {
 		}
 	}
 }
+
+
+// Need to export here instead of directly, because the Object.defineProperty needs to access the Class first
+module.exports = Ctx;

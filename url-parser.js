@@ -168,5 +168,5 @@ function body_parser(request, response, parse_options) {
 }
 
 function parse(url) {
-
+	let regex_exp = '/:/g'
 }
