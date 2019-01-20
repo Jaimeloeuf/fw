@@ -47,6 +47,7 @@ class Ctx {
 			// internally for me instead of me keeping a record in the 'ctx' object
 			'content-type': 'application/json', // Default response of API server should be in JSON
 			'cache-control': 'no-cache', // The default cache-control should be changed to suite the needs of prod env
+			'X-Powered-By': 'Electricity and Wires', // Easter egg Joke to kinda confuse pen-testers :)
 			'content-length': 0, // MUST be set by finalHandler else client will hang as it waits for the server
 		};
 		// Method to set content length header in the response message. Must be called by finalHandler module
