@@ -17,12 +17,48 @@
 
 // Dependencies
 const app = require('./fw');
+// Import DB to use.
+const db = require('./db/db');
 
 
-// app.route('')
 app.get('/login', (ctx) => {
+	/*	@Flow
+		Read the username and password input from the user
+		Verify if user exist in DB
+			User exists
+				Hash the password
+				Check if the password is correct
+					If password correct
+
+						// Should I call the token microservice to generate the token instead?
+							If I have a microservice that just generates tokens, what are its features and uses? Why do I need it?
+							- It will be generating tokens
+								- Encrypting and decrypting tokens as they will be JWE instead of JWTs
+							- It will be generating refresh tokens
+							- It will be called to generate new tokens with refresh tokens
+
+						Generate a token and a refresh token for the user and return as part of the response
+
+					else password invalid
+						Respond with an auth failure
+			User does not exist
+				Respond with a auth failure.
+		DB call failed
+			Respond with a 500 server failure
+	*/
+
 	if (ctx.auth === 'passwd')
 		createToken(ctx.auth);
+	
+	password = password_hash(password)
+	if(password == passwordfromDB)
+		// Call the token microservice
+	else
+		ctx.setStatusCode(403); // Respond with an auth failure
+	
+	
+	// DB call failed
+	ctx.setStatusCode(500); // Respond with a internal server failure.
 });
 
 
@@ -100,3 +136,22 @@ app.post('/user/forgot', (ctx) => {
 
 
 });
+
+
+/*
+	Think about how all these microservice will talk to each other?
+		By HTTP requests? gRPC? PubSub?
+		What about security for these communication protocols? What to do to prevent
+		packet sniffers? Using smth to encrypt the connection like SSL/TLS?
+	
+	Is this microservicy thing fault tolerant?
+		Meaning that if the service goes down what happerns?
+		Does it mean that it is tolerant of one instant of a single service
+		going down? Meaning that a cluster of emailing service will still be
+		fine if one node goes down.
+
+	To build out my own emailing microservice.
+		How to create an email with your own custom domain name?
+		How to send a email with that custom domain based email?
+		Add a feature/function where I can schedule when emails will be sent out.
+*/
