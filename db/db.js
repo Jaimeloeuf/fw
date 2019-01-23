@@ -14,27 +14,20 @@ const db = require('mariadb');
 const pool = db.createPool({
 	// Create the pool with the login credentials. Should update this to use credentials injected from the environment
 	host: 'mydb.com',
+	ssl: true, // To enable or disable use of TLS to encrypt communication traffic
 	user: 'myUser',
 	password: 'myPassword',
 	connectionLimit: 5
 });
 
-
-async function asyncFunction() {
-	let conn;
+/* Function that gets a connection thread from the pool and execute the given SQL command */
+async function query(sql_query) {
+	let conn, result;
 	try {
 		// Call the pool function to get a connection thread
 		conn = await pool.getConnection();
-
 		// Execute a query and wait for the results before saving it into the variable upon receiving it.
-		const rows = await conn.query("SELECT 1 as val");
-		// Display the results from the last query
-		console.log(rows); //[ {val: 1}, meta: ... ]
-
-		// Create another query/insertion and wait for the output
-		const res = await conn.query("INSERT INTO myTable value (?, ?)", [1, "db"]);
-		// Display the response of the DB after the insertion request.
-		console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+		result = await conn.query(sql_query);
 	}
 	catch (err) {
 		// Catch the error and let it bubble up.
@@ -43,26 +36,38 @@ async function asyncFunction() {
 	finally {
 		// If the connection was successfully created and stored in the variable, close the connection to free it back to the pool.
 		if (conn)
-			return conn.end();
+			conn.end();
+
+		// Return result if the DB successfully returned something
+		if (result)
+			return result;
 	}
 }
 
-
-module.exports.get = () => {
-
-}
-
+// Create and hold a single connection object/thread if you are going to constantly use it.
 class DB {
 	constructor() {
+		// Method to call the pool function to get a connection thread
+		this.connect = async () => await pool.getConnection();
+		// Method to execute query with the connection thread stored in this object.
+		this.query = async (command) => await this.conn.query(command);
+		// Method to delete off this object's connection thread
+		this.delete = () => this.conn.end()
+
+		// Get a connection thread and store it.
 		this.conn = this.connect();
-
-	}
-	connect() {
-		// Call the pool function to get a connection thread
-		return await pool.getConnection();
-	}
-
-	execute(command) {
-		return await conn.query(command);
 	}
 }
+
+module.exports.get_user = (userName) => {
+	const result = query(`SELECT * FROM users WHERE username IS ${username}`)
+		.catch((err) => console.error(err));
+	return result;
+	// Catch the error and let it bubble up.
+}
+
+
+/*	@Todo
+	See if it is valid to declare and use async methods in the constructor of the DB class.
+
+*/

@@ -52,15 +52,20 @@ app.get('/login', (ctx) => {
 	if (ctx.auth === 'passwd')
 		createToken(ctx.auth);
 
-	SQL_command = "SELECT * FROM users WHERE username IS" + username
-	
+	let user = db.get_user(username);
+	if (verify_password(password, passwordFROMDB, salt from DB))
+		// Then continue, else throw and return error by setting a reject status code
+		
 	password = password_hash(password)
-	if(password == passwordfromDB)
+
+
+
+	if (password == user.pas)
 		// Call the token microservice
 	else
 		ctx.setStatusCode(403); // Respond with an auth failure
-	
-	
+
+
 	// DB call failed
 	ctx.setStatusCode(500); // Respond with a internal server failure.
 });
@@ -92,7 +97,7 @@ app.post('/user/register', (ctx) => {
 
 	if (db.get(username)) // Username/Email not unique
 		return render_template('error', username = username); // render_template like in flask using jinja2 and stop execution
-	
+
 	// Hash the password and store it back into the same variable.
 	password = password_hash(password)
 
@@ -155,7 +160,7 @@ SQL_command = `UPDATE customer SET branch="main" WHERE custage > 2;`
 			- For my situation Kafka is better as it allows 'time-decoupled' event messaging.
 		What about security for these communication protocols? What to do to prevent
 		packet sniffers? Using smth to encrypt the connection like SSL/TLS?
-	
+
 	Is this microservicy thing fault tolerant?
 		Meaning that if the service goes down what happerns?
 		Does it mean that it is tolerant of one instant of a single service
