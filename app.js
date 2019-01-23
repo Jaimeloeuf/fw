@@ -19,6 +19,8 @@
 const app = require('./fw');
 // Import DB to use.
 const db = require('./db/db');
+// Import the hashing algorithm
+const password_hash = require('./hash');
 
 
 app.get('/login', (ctx) => {
@@ -49,6 +51,8 @@ app.get('/login', (ctx) => {
 
 	if (ctx.auth === 'passwd')
 		createToken(ctx.auth);
+
+	SQL_command = "SELECT * FROM users WHERE username IS" + username
 	
 	password = password_hash(password)
 	if(password == passwordfromDB)
@@ -89,14 +93,15 @@ app.post('/user/register', (ctx) => {
 	if (db.get(username)) // Username/Email not unique
 		return render_template('error', username = username); // render_template like in flask using jinja2 and stop execution
 	
-	// Hash the password
+	// Hash the password and store it back into the same variable.
+	password = password_hash(password)
 
 
 	// Create the data format for database insertion
 
 
 	// Insert data into DB
-
+	SQL_command = `INSERT INTO user(userID, userName, password, userType) VALUES ('appl01', 'main', 'A');`
 
 	// If DB insertion successful, redirect user to the login page
 
@@ -137,10 +142,17 @@ app.post('/user/forgot', (ctx) => {
 
 });
 
+// SQL command to update the password in the DB with a new one when the user forgets it.
+SQL_command = `UPDATE customer SET branch="main" WHERE custage > 2;`
+
 
 /*
 	Think about how all these microservice will talk to each other?
 		By HTTP requests? gRPC? PubSub?
+			- See how can users of this framework implement gRPC communication with another instance of this framework
+			  that belongs to a seperate 'micro service'
+			- See how I can implement the Pub Sub model here, by allowing users to use both Redis and Kafka as pub sub
+			- For my situation Kafka is better as it allows 'time-decoupled' event messaging.
 		What about security for these communication protocols? What to do to prevent
 		packet sniffers? Using smth to encrypt the connection like SSL/TLS?
 	
@@ -151,6 +163,7 @@ app.post('/user/forgot', (ctx) => {
 		fine if one node goes down.
 
 	To build out my own emailing microservice.
+		- The email microservice will be in charge of storing the mailing list
 		How to create an email with your own custom domain name?
 		How to send a email with that custom domain based email?
 		Add a feature/function where I can schedule when emails will be sent out.
