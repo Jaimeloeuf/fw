@@ -5,6 +5,7 @@
 	- The userID will be used as the Primary Key of the table
 	- Number up to 6 Digits.
 	- Auto-increment
+	- Number (6)
 	- cannot reuse the number
 - userName / user-email
 	- The email used to sign up for the system

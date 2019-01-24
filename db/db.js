@@ -7,18 +7,13 @@
 
 */
 
-// Dependencies
+/* Dependencies */
+// MariaDB connector
 const db = require('mariadb');
 
-// Create a pool of available connections to the DB
-const pool = db.createPool({
-	// Create the pool with the login credentials. Should update this to use credentials injected from the environment
-	host: 'mydb.com',
-	ssl: true, // To enable or disable use of TLS to encrypt communication traffic
-	user: 'myUser',
-	password: 'myPassword',
-	connectionLimit: 5
-});
+/* Read the values from the environmental variables using the config module in this directory.
+Create a pool of available connections to the DB with the login credentials. */
+const pool = db.createPool(require('./config'));
 
 /* Function that gets a connection thread from the pool and execute the given SQL command */
 async function query(sql_query) {
@@ -69,5 +64,4 @@ module.exports.get_user = (userName) => {
 
 /*	@Todo
 	See if it is valid to declare and use async methods in the constructor of the DB class.
-
 */

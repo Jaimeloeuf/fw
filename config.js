@@ -1,4 +1,10 @@
-// Config.js is a Module used to create and export configuration variables
+'use strict'; // Enforce use of strict verion of JavaScript
+
+/*	@Doc
+	Config.js is a Module used to create and export configuration variables, and allow users to use
+	variables read from the envrionmental variables, and store settings into a configuration file,
+	for long term / permanent storage of it.
+*/
 
 // Container for all environments
 const environments = {};

@@ -49,19 +49,15 @@ app.get('/login', (ctx) => {
 			Respond with a 500 server failure
 	*/
 
-	if (ctx.auth === 'passwd')
-		createToken(ctx.auth);
-
 	let user = db.get_user(username);
-	if (verify_password(password, passwordFROMDB, salt from DB))
+
+	if (verify_password((password + salt), passwordFROMDB)) {
 		// Then continue, else throw and return error by setting a reject status code
-		
-	password = password_hash(password)
-
-
-
-	if (password == user.pas)
 		// Call the token microservice
+		if (ctx.auth === 'passwd')
+			createToken(ctx.auth);
+
+	}
 	else
 		ctx.setStatusCode(403); // Respond with an auth failure
 
