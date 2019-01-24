@@ -21,7 +21,10 @@ const app = require('./fw');
 const db = require('./db/db');
 // Import the hashing algorithm
 const password_hash = require('./hash');
+const bcrypt = require('');
 
+// Number of rounds used to generate the salt for the BCrypt hash function
+const salt_rounds = 12;
 
 app.get('/login', (ctx) => {
 	/*	@Flow
@@ -50,17 +53,23 @@ app.get('/login', (ctx) => {
 	*/
 
 	let user = db.get_user(username);
+	let password = user.password;
 
-	if (verify_password((password + salt), passwordFROMDB)) {
-		// Then continue, else throw and return error by setting a reject status code
-		// Call the token microservice
-		if (ctx.auth === 'passwd')
+	bcrypt.compare(password, hash)
+		.then((res) => {
+			// res === true
+
+			// Then continue, else throw and return error by setting a reject status code
+			// Call the token microservice
 			createToken(ctx.auth);
 
-	}
-	else
-		ctx.setStatusCode(403); // Respond with an auth failure
 
+			ctx.setStatusCode(403); // Respond with an auth failure
+		});
+
+	res = await bcrypt.compare("B4c0/\/", hash);
+	if (!res)
+		return false;
 
 	// DB call failed
 	ctx.setStatusCode(500); // Respond with a internal server failure.
@@ -95,7 +104,12 @@ app.post('/user/register', (ctx) => {
 		return render_template('error', username = username); // render_template like in flask using jinja2 and stop execution
 
 	// Hash the password and store it back into the same variable.
-	password = password_hash(password)
+	bcrypt.hash(password, salt_rounds, (err, hash) => {
+		if (err)
+			return console.log(err);
+		hash;
+		db.enter(hash);
+	});
 
 
 	// Create the data format for database insertion
@@ -103,9 +117,10 @@ app.post('/user/register', (ctx) => {
 
 	// Insert data into DB
 	SQL_command = `INSERT INTO user(userID, userName, password, userType) VALUES ('appl01', 'main', 'A');`
+	result = db.query(SQL_command);
 
 	// If DB insertion successful, redirect user to the login page
-
+	ctx.res_headers.location = '/home'; // ?? correct location?
 
 
 	// Send a email to the user

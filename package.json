@@ -1,0 +1,32 @@
+{
+	"name": "fw",
+	"version": "0.1.0",
+	"description": "A super fast, simple to use node JS framework that has little to no external dependencies used for building backend RESTful API servers.",
+	"main": "index.js",
+	"directories": {
+		"test": "test"
+	},
+	"dependencies": {
+		"jsonwebtoken": "^8.4.0",
+		"mariadb": "^2.0.2-rc"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server.git"
+	},
+	"keywords": [
+		"server",
+		"framework"
+	],
+	"author": "Jaime Loeuf",
+	"license": "BSD 3-Clause License",
+	"bugs": {
+		"url": "https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server/issues"
+	},
+	"homepage": "https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server#readme"
+}
