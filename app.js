@@ -21,7 +21,7 @@ const app = require('./fw');
 const db = require('./db/db');
 // Import the hashing algorithm
 const password_hash = require('./hash');
-const bcrypt = require('');
+const bcrypt = require('bcryptjs');
 
 // Number of rounds used to generate the salt for the BCrypt hash function
 const salt_rounds = 12;
