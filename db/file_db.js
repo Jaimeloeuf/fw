@@ -29,9 +29,8 @@ lib.create = function (dir, file, data, callback) {
 };
 
 
-lib.create = function (dir, file, data = '') {
-	return new Promise((resolve, reject) => {
-
+lib.create = (dir, file, data = '') =>
+	new Promise((resolve, reject) => {
 		// Open the file for writing
 		fs.open(lib.baseDir + dir + '/' + file + '.json', 'wx', (err, fileDescriptor) => {
 			if (err)
@@ -51,7 +50,6 @@ lib.create = function (dir, file, data = '') {
 			}
 		});
 	});
-};
 
 
 // Write or append??

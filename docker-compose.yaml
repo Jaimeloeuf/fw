@@ -1,0 +1,7 @@
+# Example docker-compose.yaml file for running multiple services with 1 config file
+version: 3
+  static_server
+
+  auth_service
+
+  event_bus
