@@ -23,7 +23,7 @@
 */
 
 // Dependencies
-const { debug } = require('./utils/utils');
+const { print, debug } = require('./utils/utils');
 const { envName } = require('./config').env;
 
 // const finalHandler = (ctx) => { // Which function declaration should I 
@@ -42,10 +42,10 @@ var reqCount = 0; // Global variable to track number of completed requests. Used
 function devMode(ctx) {
 	finalHandler(ctx); // Call the res, finalHandler
 	// Do all the logging and stuff here
-	console.log(`Servicing req number: ${++reqCount}`); // Count the nummber of requests serviced
+	print(`Servicing req number: ${++reqCount}`); // Count the nummber of requests serviced
 	console.timeEnd('Cycle time'); // Time taken for full req/res cycle including time for logging/debugging above
 	debug.logout_params(ctx); // Log out the ctx object for debugging
-	console.log('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
+	print('Mem usage', (process.memoryUsage().rss / 1024 / 1024).toFixed(3)); // In MB
 }
 
 /*	Auto choose a 'finalHandler' based on current environment mode.

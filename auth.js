@@ -15,7 +15,7 @@ var crypto;
 try {
 	crypto = require('crypto');
 } catch (err) {
-	log('crypto support is disabled!');
+	console.log('crypto support is disabled!');
 }
 
 // See how to improve this hash, as the .update is @deprecated

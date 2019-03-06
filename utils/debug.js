@@ -4,11 +4,11 @@
 	This module exports a function to allow me to debug by logging out information of the req/res objects
 */
 
-// Dependencies
-const { log, write } = require('./log');
+const print = console.log;
+const write = process.stdout.write;
 
 // const { envName } = require('./config').env;
-// if current 'env' is 'production' Allow debug object to still be used, but to log to a error logging service instead?
+// if current 'env' is 'production' Log debug object to a error logging service instead.
 
 
 module.exports = {
@@ -20,23 +20,23 @@ module.exports = {
 	},
 
 	logout_params(ctx) {
-		// Debug middleware to log out details from ctx object
+		// Debug middleware to print out details from ctx object
 		this.console_lines(90);
 		// Items from Req obj
-		log(`Requested path: '${ctx.path}'`);
-		log(`Request method: '${ctx.method}'`);
-		log('Queries received in url = ', ctx.query);
-		log('Headers received = ', ctx.headers);
-		if (ctx.req_body)	// Log req_body if any
-			log('Request Body: ', ctx.req_body);
+		print(`Requested path: '${ctx.path}'`);
+		print(`Request method: '${ctx.method}'`);
+		print('Queries received in url = ', ctx.query);
+		print('Headers received = ', ctx.headers);
+		if (ctx.req_body)	// print req_body if any
+			print('Request Body: ', ctx.req_body);
 		this.console_lines(60);
 		// Items from Res obj
-		log(`Response status code: ${ctx.statusCode}`);
-		log('Response Headers are = ', ctx.res_headers);
-		log('Response Body: ', ctx.res_body);
+		print(`Response status code: ${ctx.statusCode}`);
+		print('Response Headers are = ', ctx.res_headers);
+		print('Response Body: ', ctx.res_body);
 		this.console_lines(60);
-		// Log Error if any
+		// print Error if any
 		if (ctx.error.length)
-			log(`${ctx.error.length} Errors in error array for current ctx:\n`, ctx.error);
+			print(`${ctx.error.length} Errors in error array for current ctx:\n`, ctx.error);
 	}
 };

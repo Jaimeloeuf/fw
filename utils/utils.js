@@ -5,12 +5,9 @@
 	Use object deconstruction to get the functions out.
 */
 
-// Dependencies
-// const loggers = require('./log');
-const { log, write, log_error } = require('./log');
+// const { log_error } = require('./log');
 
-/* To test if below parseJSON methods work before refactoring out to their own modules. */
-// Parse a JSON string to an object in all cases, without throwing
+// Parse a JSON string to an object in all cases, silencing any errors
 const parseJSON = (str) => {
 	try { return JSON.parse(str); }
 	catch (e) { return {}; } // Should I return false here instead
@@ -24,9 +21,10 @@ const parseJSON2 = (str) => {
 };
 
 module.exports = {
-	write: write,
-	log: log,
-	log_error: log_error,
+	// The write/logging methods are just simple bindings for abbrevation
+	print: console.log,
+	write: process.stdout.write,
+	log_error: console.error,
 	debug: require('./debug'),
-	parseJSON: parseJSON
+	parseJSON
 };

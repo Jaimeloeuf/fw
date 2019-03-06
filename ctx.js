@@ -120,7 +120,7 @@ function getCookies(cookie) {
 				case 'exp':
 
 				default:
-					log('Invalid param for cookies');
+					console.log('Invalid param for cookies');
 			}
 		}
 	}
