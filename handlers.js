@@ -6,36 +6,11 @@
 	handlers object and export all of it as one handler object to the router.
 
 	The functions/handlers defined in this file will be available to to anyone using this as a framework.
+	@Todo to remove all the below handlers as the framework should be unopinionated, else allow user to override these
 */
 
 // Dependencies
-const { createToken, verify } = require('./token');
-
 const handlers = {};
-
-
-handlers.login = (ctx) => {
-	return createToken(ctx);
-};
-
-handlers.user = (ctx) => {
-	return verify(ctx);
-}
-
-// Login handler
-// handlers.login = (ctx) => {
-// 	// if (async auth_db(headers.authentication)) {
-// 	// 	await ok();
-// 	// 	Add cookie to Headers of Response object
-// 	// 	ctx.res_headers.cookie = { 'Set-cookie': `${cookie}; ${expiry_date};` }
-// 	// 	next(307, { 'location': `/${location}` })
-// 	// }
-// 	return ctx; // To trigger the next .then method
-// };
-// logout handler
-handlers.logout = (ctx) => {
-
-};
 
 // Sample handler using 'ctx'
 handlers.sample = (ctx) => {
@@ -43,23 +18,6 @@ handlers.sample = (ctx) => {
 	ctx.setStatusCode(201);
 	ctx.res_body = { 'handler name': 'sample handler' };
 };
-
-// Example code below to test out the idea
-// Sample handler to test returning a Promise using 'ctx'
-handlers.sample2 = (ctx) => {
-	// Send back a HTTP code and a 'res' payload
-	return new Promise((resolve, reject) => {
-		ctx.setStatusCode(201);
-		ctx.res_body = { 'handler name': 'sample handler' };
-
-		// Call to DB...... need to wait
-		ctx.res_body.data = db.getData(ctx.req_payload.userID);
-		if (ctx.res_body.data) // If data is not undefined
-			return resolve(ctx); // To trigger the next .then method
-		return reject('ERROR: Cannot retrieve data from database, user dont exist');
-	});
-};
-
 
 // Ping handler to see if server is up, nothing needs to be done as status code 200 is the default value
 handlers.ping = (ctx) => {

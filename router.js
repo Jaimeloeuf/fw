@@ -11,32 +11,19 @@
 // Dependencies
 const handler = require('./handlers');
 
-// Routers for different request method named as such
+/* Routers for different HTTP request methods. */
+
+// GET router with some default route and handlers
 const GET = {
 	'sample': handler.sample,
 	'ping': handler.ping,
-	'user': handler.user,
-	'user/<hex: userID>': handler.user
 }
 
-const POST = {
-	'login': handler.login,
-	'logout': handler.logout
-}
-
-const PUT = {
-}
-
-const DEL = {
-}
+// Empty objects for holding routes and their corresponding handlers
+const POST = {}, PUT = {}, DEL = {};
 
 // 'Routers' object to store all the routers for different request methods
-const routers = {
-	GET: GET,
-	POST: POST,
-	PUT: PUT,
-	DEL: DEL
-}
+const routers = { GET, POST, PUT, DEL, }
 
 module.exports = (ctx) => {
 	// Get a router based on the request method
@@ -127,7 +114,7 @@ call router
 			- return the handler back to the server module.
 		F: If no route handlers, then return the 404 notFound default handler back to server module
 
-	
+
 	The problem is that all the handlers have a standard input parameter/arguement list which
 	is the ctx object. So when the server calls the handler function, it just needs to pass it the
 	ctx object, which it has a referenc in the server module. So the other additional variables, how
