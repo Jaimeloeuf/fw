@@ -24,7 +24,8 @@
 	The last '.catch' is called if '.finally' call throws any error.
 
 	@TODO
-	Change the error logging in the trycatch block to use a universal logging and error collection method
+	Change the error logging in the trycatch block to use a universal logging and error collection method.
+	Should the error be allowed to fail silently if there is not interactive logging method like stdout?
 */
 
 // Dependencies
@@ -34,14 +35,16 @@ const bodyParser = require('./body_parser'); // Promise returning function for p
 const router = require('./router'); // Function/router for getting a route handler for a specific route.
 const finalHandler = require('./finalHandler'); // Final route Handler for responding back to the client.
 
+// Functions that logs out different memory usages
+const get_total_mem = () => console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
+const get_mem_usage = () => console.log(`Current Mem usage: ${(process.memoryUsage().rss / 1024 / 1024).toFixed(4)}MB`);
 // At server start, display avail memory, and current memory usage. Convert avail memory from bytyes to MB and round to 2 d.p.
-console.log(`Total memory for process: ${(require('v8').getHeapStatistics().total_available_size / 1024 / 1024).toFixed(2)}MB`);
-console.log(`Current Mem usage: ${(process.memoryUsage().rss / 1024 / 1024).toFixed(4)}MB`);
+get_total_mem();
+get_mem_usage();
 
 module.exports = async (req, res) => {
 	debug();
 	const ctx = new Ctx(req, res); // Create a new 'ctx' object with the (req, res) objects.
-	// @Note_to_self Should I use const or let/var? Will variable be overwritten during concurrent requests?
 
 	try { // Main async block sequenced inside a try/catch block
 		await getPayload(ctx);
