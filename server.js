@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
 		await router(ctx)(ctx); // Get a route Handler from the router and call the handler immediately.
 	} catch (err) { ctx.newError(err); } // Add error into the error array.
 
-	try { finalHandler(ctx); } // Removed the await
+	try { finalHandler(ctx); }
 	catch (err) { console.error(err); } // For any error, just log it out, as not possible to respond to the client.
 }
 
