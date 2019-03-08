@@ -92,6 +92,19 @@ function url_parser3(routes_map, url) {
 				if (!i)
 					return variables; // When all tokens looped through
 			}
+
+			/* Below is the while loop that does the same as the above for loop. */
+			let i = value.token_count - 1;
+			while (i--) // Check/test if this loop works
+			{
+				token = value.token_array[i];
+				if (token.charAt(0) === ':') // If the token in Map starts with a ':' to indicate variable, then read and store the variable into the variables object
+					variables[token.slice(1)] = url_array[i]; // Read variable in URL into object
+				else if (token !== url_array[i])
+					break; // Skip this prototype and go to the next one
+			}
+			return variables; // When all tokens looped through
+
 		}
 	}
 	return undefined;
