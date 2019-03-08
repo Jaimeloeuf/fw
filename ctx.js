@@ -96,6 +96,8 @@ function redirect(url, redirect_type = 307, cont = true) {
 	console.log(`Redirecting req to ${url}`); // logging activity
 }
 
+// Look into using the cookieParser module that express also uses.
+
 // Returns an object with all the cookies
 function getCookies(cookie) {
 	cookie = cookie.split('=');
@@ -126,5 +128,5 @@ function getCookies(cookie) {
 	}
 }
 
-// Need to export here instead of directly, because the Object.defineProperty needs to access the Class first
+// Exporting Ctx class at the end, as the Object.defineProperty needs to access the Class first
 module.exports = Ctx;

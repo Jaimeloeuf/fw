@@ -8,8 +8,7 @@
 	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
-		"jsonwebtoken": "^8.4.0",
-		"mariadb": "^2.0.2-rc"
+		"jsonwebtoken": "^8.4.0"
 	},
 	"devDependencies": {},
 	"scripts": {
