@@ -10,23 +10,25 @@
 		"bcryptjs": "^2.4.3",
 		"jsonwebtoken": "^8.4.0"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"mocha": "^6.0.2"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node server.js"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server.git"
+		"url": "git+https://github.com/Jaimeloeuf/fw-NodeJS.git"
 	},
 	"keywords": [
 		"server",
 		"framework"
 	],
 	"author": "Jaime Loeuf",
-	"license": "BSD 3-Clause License",
+	"license": "BSD-3-Clause",
 	"bugs": {
-		"url": "https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server/issues"
+		"url": "https://github.com/Jaimeloeuf/fw-NodeJS/issues"
 	},
-	"homepage": "https://github.com/Jaimeloeuf/Pure-Node.JS-API-Server#readme"
+	"homepage": "https://github.com/Jaimeloeuf/fw-NodeJS#readme"
 }
