@@ -78,3 +78,7 @@ The user of this framework will have access to the:
 2.	The db schema file to define your own db / settings / schema and more
 3.	user Config file that will be read in by the config module.
 	In this file you can choose to disable default route handlers like ping.
+
+## License
+This framework is open source under the "BSD 3-Clause License".  
+The author holds no liabilities for how this framework is used.
