@@ -1,7 +1,7 @@
 {
 	"name": "fw",
 	"version": "0.1.0",
-	"description": "A super fast, simple to use node JS framework that has little to no external dependencies used for building backend RESTful API servers.",
+	"description": "A super fast and simple to use node JS framework that has little to no external dependencies used for building backend RESTful API servers.",
 	"main": "index.js",
 	"directories": {
 		"test": "test"
