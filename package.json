@@ -2,24 +2,16 @@
 	"name": "fw",
 	"version": "0.1.0",
 	"description": "A super fast and simple to use node JS framework that has little to no external dependencies used for building backend RESTful API servers.",
-	"main": "index.js",
+	"main": "./src/index.js",
 	"directories": {
 		"test": "test"
 	},
 	"dependencies": {
-		"bcryptjs": "^2.4.3",
 		"jsonwebtoken": "^8.4.0"
-	},
-	"devDependencies": {
-		"mocha": "^6.2.0"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node server.js"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Jaimeloeuf/fw-NodeJS.git"
+		"url": "git+https://github.com/Jaimeloeuf/fw.git"
 	},
 	"keywords": [
 		"server",
@@ -28,7 +20,7 @@
 	"author": "Jaime Loeuf",
 	"license": "BSD-3-Clause",
 	"bugs": {
-		"url": "https://github.com/Jaimeloeuf/fw-NodeJS/issues"
+		"url": "https://github.com/Jaimeloeuf/fw/issues"
 	},
-	"homepage": "https://github.com/Jaimeloeuf/fw-NodeJS#readme"
+	"homepage": "https://github.com/Jaimeloeuf/fw#readme"
 }
